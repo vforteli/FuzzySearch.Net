@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32505.173
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuzzySearchNet", "FuzzySearchNet\FuzzySearchNet.csproj", "{5DCAC51E-CE47-4268-8CCE-44B4D3F95EAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuzzySearchNet.Tests", "FuzzySearchNet.Tests\FuzzySearchNet.Tests.csproj", "{98ABDD95-91F2-4828-A151-4801ED9DF08D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5DCAC51E-CE47-4268-8CCE-44B4D3F95EAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DCAC51E-CE47-4268-8CCE-44B4D3F95EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DCAC51E-CE47-4268-8CCE-44B4D3F95EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DCAC51E-CE47-4268-8CCE-44B4D3F95EAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98ABDD95-91F2-4828-A151-4801ED9DF08D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98ABDD95-91F2-4828-A151-4801ED9DF08D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98ABDD95-91F2-4828-A151-4801ED9DF08D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98ABDD95-91F2-4828-A151-4801ED9DF08D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F064F8B1-D6C2-451E-9CD8-6A2059633161}
+	EndGlobalSection
+EndGlobal
