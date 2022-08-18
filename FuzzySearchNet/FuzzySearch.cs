@@ -8,7 +8,7 @@ public class FuzzySearch
     /// <param name="term"></param>
     /// <param name="text"></param>
     /// <param name="maxDistance"></param>
-    public static IEnumerable<MatchResult> Find(string term, Stream text, int maxDistance = 3)
+    public static async Task<IEnumerable<MatchResult>> Find(string term, Stream text, int maxDistance = 3)
     {
         if (string.IsNullOrEmpty(term))
         {
@@ -17,7 +17,7 @@ public class FuzzySearch
 
         if (maxDistance != 0)
         {
-            throw new NotImplementedException();
+            return await FindSubstitutionsOnly(term, text, maxDistance);
         }
         else
         {
@@ -64,7 +64,64 @@ public class FuzzySearch
             currentIndex++;
         }
     }
+
+
+    /// <summary>
+    /// Finds term in text with max distance 0, full match that is.
+    /// </summary>
+    /// <param name="term"></param>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    internal static async Task<IEnumerable<MatchResult>> FindSubstitutionsOnly(string term, Stream text, int maxDistance)
+    {
+        // foo--fo----f--f-oo--
+        // foo
+        var matches = new List<MatchResult>();
+
+        using var streamReader = new StreamReader(text);
+        var textString = await streamReader.ReadToEndAsync();   // todo make this use stream chunks...
+
+        var needlePosition = 0;
+        var termLengthMinusOne = term.Length - 1;
+        var termLength = term.Length;
+        var currentIndex = 0;
+        var candidateDistance = 0;
+
+        for (var textIndex = 0; textIndex < textString.Length - termLengthMinusOne ; textIndex++)
+        {
+            needlePosition = currentIndex;
+            candidateDistance = 0;
+
+            for (var termIndex = 0; termIndex < termLength; termIndex++)
+            {
+                if (needlePosition >= textString.Length)
+                {
+                    break;
+                }
+                if (textString[needlePosition++] != term[termIndex])
+                {
+                    candidateDistance++;
+                    if (candidateDistance > maxDistance)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (candidateDistance <= maxDistance)
+            {
+                var endIndex = currentIndex + termLengthMinusOne;
+                matches.Add(new MatchResult(currentIndex, endIndex, textString.Substring(currentIndex, termLength)));
+            }
+
+            currentIndex++;
+        }
+
+        return matches;
+    }
 }
+
+
 
 
 public record MatchResult(int StartIndex, int EndIndex, string Match);

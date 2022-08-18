@@ -2,16 +2,16 @@ using System.Text;
 
 namespace FuzzySearchNet.Tests
 {
-    public class FuzzySearchTests
+    public class FuzzySearchExactMatchTests
     {
         [Test]
-        public void TestZeroMaxDistanceMultiple()
+        public async Task TestZeroMaxDistanceMultiple()
         {
             var word = "foo";
             var text = "foo-----fo--foo-f--fooo--";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
 
-            var results = FuzzySearch.Find(word, stream, 0).ToList();
+            var results = (await FuzzySearch.Find(word, stream, 0)).ToList();
 
             Assert.That(results.Count, Is.EqualTo(3));
 
@@ -29,25 +29,25 @@ namespace FuzzySearchNet.Tests
         }
 
         [Test]
-        public void TestZeroMaxDistanceNoMatch()
+        public async Task TestZeroMaxDistanceNoMatch()
         {
             var word = "foo";
             var text = "fo------fo--fo--f--fo-o--";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
 
-            var results = FuzzySearch.Find(word, stream, 0).ToList();
+            var results = (await FuzzySearch.Find(word, stream, 0)).ToList();
 
             Assert.That(results.Count, Is.EqualTo(0));
         }
 
         [Test]
-        public void TestZeroMaxDistancePerfectMatch()
+        public async Task TestZeroMaxDistancePerfectMatch()
         {
             var word = "foo";
             var text = "foo";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
 
-            var results = FuzzySearch.Find(word, stream, 0).ToList();
+            var results = (await FuzzySearch.Find(word, stream, 0)).ToList();
 
             Assert.That(results.Count, Is.EqualTo(1));
 
