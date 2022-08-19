@@ -8,7 +8,7 @@ public class FuzzySearch
     /// <param name="term"></param>
     /// <param name="text"></param>
     /// <param name="maxDistance"></param>
-    public static async Task<IEnumerable<MatchResult>> Find(string term, Stream text, int maxDistance = 3)
+    public static async Task<IEnumerable<MatchResult>> FindAsync(string term, Stream text, int maxDistance = 3)
     {
         if (string.IsNullOrEmpty(term))
         {

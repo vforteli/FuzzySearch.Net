@@ -11,7 +11,7 @@ namespace FuzzySearchNet.Tests
             var text = "foo-----fo--foo-f--fooo--";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
 
-            var results = (await FuzzySearch.Find(word, stream, 0)).ToList();
+            var results = (await FuzzySearch.FindAsync(word, stream, 0)).ToList();
 
             Assert.That(results.Count, Is.EqualTo(3));
 
@@ -35,7 +35,7 @@ namespace FuzzySearchNet.Tests
             var text = "fo------fo--fo--f--fo-o--";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
 
-            var results = (await FuzzySearch.Find(word, stream, 0)).ToList();
+            var results = (await FuzzySearch.FindAsync(word, stream, 0)).ToList();
 
             Assert.That(results.Count, Is.EqualTo(0));
         }
@@ -47,7 +47,7 @@ namespace FuzzySearchNet.Tests
             var text = "foo";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
 
-            var results = (await FuzzySearch.Find(word, stream, 0)).ToList();
+            var results = (await FuzzySearch.FindAsync(word, stream, 0)).ToList();
 
             Assert.That(results.Count, Is.EqualTo(1));
 
