@@ -10,7 +10,6 @@ public class FuzzySearch
     /// <param name="maxDistance"></param>
     public static async Task<IEnumerable<MatchResult>> FindAsync(string term, Stream text, int maxDistance = 3)
     {
-        await Task.CompletedTask;
         if (string.IsNullOrEmpty(term))
         {
             throw new ArgumentException("Term cannot be null", nameof(term));
@@ -18,7 +17,7 @@ public class FuzzySearch
 
         if (maxDistance != 0)
         {
-            return await FindSubstitutionsOnlyBuffering(term, text, maxDistance);
+            return await FindSubstitutionsOnlyBufferingAsync(term, text, maxDistance);
         }
         else
         {
@@ -33,7 +32,7 @@ public class FuzzySearch
     /// <param name="term"></param>
     /// <param name="text"></param>
     /// <returns></returns>
-    internal static IEnumerable<MatchResult> FindZeroDistance(string term, Stream text)
+    public static IEnumerable<MatchResult> FindZeroDistance(string term, Stream text)
     {
         using var streamReader = new StreamReader(text);
 
@@ -73,7 +72,7 @@ public class FuzzySearch
     /// <param name="term"></param>
     /// <param name="text"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<MatchResult>> FindSubstitutionsOnlyBuffering(string term, Stream text, int maxDistance)
+    public static async Task<IEnumerable<MatchResult>> FindSubstitutionsOnlyBufferingAsync(string term, Stream text, int maxDistance)
     {
         var matches = new List<MatchResult>();
 
