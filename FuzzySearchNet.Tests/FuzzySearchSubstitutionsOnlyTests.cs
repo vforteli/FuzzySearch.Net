@@ -65,21 +65,83 @@ namespace FuzzySearchNet.Tests
             });
         }
 
-        [Test]
-        public async Task TestSomething()
-        {
-            var word = "someword";
-            var text = "herpenderp husef sf ffsefsfät fsefkjhsef \nsom3w0rd: hurr durr sflk sesfjse flskejfsef kjshefsffjfj";
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
 
-            var results = (await FuzzySearch.FindAsync(word, stream, 2)).ToList();
+        [Test]
+        public async Task TestSomething2()
+        {
+            var pattern = "TGCACTGTAGGGATAACAAT";
+            var text = "GACTAGCACTGTAGGGATAACAATTTCACACAGGTGGACAATTACATTGAAAATCACAGATTGGTCACACACACATTGGACATACATAGAAACACACACACATACATTAGATACGAACATAGAAACACACATTAGACGCGTACATAGACACAAACACATTGACAGGCAGTTCAGATGATGACGCCCGACTGATACTCGCGTAGTCGTGGGAGGCAAGGCACACAGGGGATAGG";
+
+            var results = (await FuzzySearch.FindAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), 2)).ToList();
 
             Assert.Multiple(() =>
             {
                 Assert.That(results.Count, Is.EqualTo(1));
+
+                Assert.That(results[0].StartIndex, Is.EqualTo(4));
+                Assert.That(results[0].EndIndex, Is.EqualTo(24));
+                Assert.That(results[0].Match, Is.EqualTo(text[4..24]));
+            });
+        }
+
+
+        [Test]
+        public async Task TestSomething()
+        {
+            var pattern = "GGGTTLTTSS";
+            var text = "XXXXXXXXXXXXXXXXXXXGGGTTVTTSSAAAAAAAAAAAAAGGGTTLTTSSAAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBBBBGGGTTLTTSS";
+
+            var results = (await FuzzySearch.FindAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), 0)).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(results.Count, Is.EqualTo(2));
+
                 Assert.That(results[0].StartIndex, Is.EqualTo(42));
-                Assert.That(results[0].EndIndex, Is.EqualTo(50));
-                Assert.That(results[0].Match, Is.EqualTo("som3w0rd"));
+                Assert.That(results[0].EndIndex, Is.EqualTo(52));
+                Assert.That(results[0].Match, Is.EqualTo(text[42..52]));
+
+                Assert.That(results[1].StartIndex, Is.EqualTo(99));
+                Assert.That(results[1].EndIndex, Is.EqualTo(109));
+                Assert.That(results[1].Match, Is.EqualTo(text[99..109]));
+            });
+
+            var results2 = (await FuzzySearch.FindAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1)).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(results2.Count, Is.EqualTo(3));
+
+                Assert.That(results2[0].StartIndex, Is.EqualTo(19));
+                Assert.That(results2[0].EndIndex, Is.EqualTo(29));
+                Assert.That(results2[0].Match, Is.EqualTo(text[19..29]));
+
+                Assert.That(results2[1].StartIndex, Is.EqualTo(42));
+                Assert.That(results2[1].EndIndex, Is.EqualTo(52));
+                Assert.That(results2[1].Match, Is.EqualTo(text[42..52]));
+
+                Assert.That(results2[2].StartIndex, Is.EqualTo(99));
+                Assert.That(results2[2].EndIndex, Is.EqualTo(109));
+                Assert.That(results2[2].Match, Is.EqualTo(text[99..109]));
+            });
+
+            var results3 = (await FuzzySearch.FindAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), 2)).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(results3.Count, Is.EqualTo(3));
+
+                Assert.That(results3[0].StartIndex, Is.EqualTo(19));
+                Assert.That(results3[0].EndIndex, Is.EqualTo(29));
+                Assert.That(results3[0].Match, Is.EqualTo(text[19..29]));
+
+                Assert.That(results3[1].StartIndex, Is.EqualTo(42));
+                Assert.That(results3[1].EndIndex, Is.EqualTo(52));
+                Assert.That(results3[1].Match, Is.EqualTo(text[42..52]));
+
+                Assert.That(results3[2].StartIndex, Is.EqualTo(99));
+                Assert.That(results3[2].EndIndex, Is.EqualTo(109));
+                Assert.That(results3[2].Match, Is.EqualTo(text[99..109]));
             });
         }
     }

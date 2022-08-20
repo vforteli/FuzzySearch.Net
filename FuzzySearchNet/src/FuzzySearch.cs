@@ -8,20 +8,24 @@ public class FuzzySearch
     /// <param name="term"></param>
     /// <param name="text"></param>
     /// <param name="maxDistance"></param>
-    public static async Task<IEnumerable<MatchResult>> FindAsync(string term, Stream text, int maxDistance = 3)
+    public static async Task<IEnumerable<MatchResult>> FindAsync(string term, Stream text, int maxDistance = 3, bool substitutionsOnly = true)
     {
         if (string.IsNullOrEmpty(term))
         {
             throw new ArgumentException("Term cannot be null", nameof(term));
         }
 
-        if (maxDistance != 0)
+        if (maxDistance == 0)
+        {
+            return FindExact(term, text);
+        }
+        else if (substitutionsOnly)
         {
             return await FindSubstitutionsOnlyBufferingAsync(term, text, maxDistance);
         }
         else
         {
-            return FindZeroDistance(term, text);
+            return await FindBufferingAsync(term, text, maxDistance);
         }
     }
 
@@ -30,9 +34,8 @@ public class FuzzySearch
     /// Finds term in text with max distance 0, full match that is.
     /// </summary>
     /// <param name="term"></param>
-    /// <param name="text"></param>
-    /// <returns></returns>
-    public static IEnumerable<MatchResult> FindZeroDistance(string term, Stream text)
+    /// <param name="text"></param>    
+    public static IEnumerable<MatchResult> FindExact(string term, Stream text)
     {
         using var streamReader = new StreamReader(text);
 
@@ -70,8 +73,7 @@ public class FuzzySearch
     /// Finds term in text with only substitutions
     /// </summary>
     /// <param name="term"></param>
-    /// <param name="text"></param>
-    /// <returns></returns>
+    /// <param name="text"></param>    
     public static async Task<IEnumerable<MatchResult>> FindSubstitutionsOnlyBufferingAsync(string term, Stream text, int maxDistance)
     {
         var matches = new List<MatchResult>();
@@ -93,7 +95,7 @@ public class FuzzySearch
 
             for (termIndex = 0; termIndex < termLength; termIndex++)
             {
-                if (textString[needlePosition++] != term[termIndex])
+                if (textString[needlePosition] != term[termIndex])
                 {
                     candidateDistance++;
                     if (candidateDistance > maxDistance)
@@ -101,6 +103,8 @@ public class FuzzySearch
                         break;
                     }
                 }
+
+                needlePosition++;
             }
 
             if (candidateDistance <= maxDistance)
@@ -111,6 +115,20 @@ public class FuzzySearch
 
         return matches;
     }
-}
 
-public record MatchResult(int StartIndex, int EndIndex, int Distance, string Match);
+
+    /// <summary>
+    /// Finds term in text with max distance
+    /// </summary>
+    /// <param name="term"></param>
+    /// <param name="text"></param>    
+    public static async Task<IEnumerable<MatchResult>> FindBufferingAsync(string term, Stream text, int maxDistance)
+    {
+        var matches = new List<MatchResult>();
+
+        using var streamReader = new StreamReader(text);
+        var textString = await streamReader.ReadToEndAsync();   // todo make this use stream chunks...
+
+        throw new NotImplementedException("yeaaa..");
+    }
+}

@@ -53,6 +53,17 @@ var summary = BenchmarkRunner.Run<BenchmarkFuzzySearch>();
 
 
 
+|                                 Method |     Mean |     Error |    StdDev |   Median |
+|--------------------------------------- |---------:|----------:|----------:|---------:|
+|         SubstitutionOnlyBufferingShort | 2.582 us | 0.0515 us | 0.1233 us | 2.543 us |
+|          SubstitutionOnlyBufferingLong | 2.053 us | 0.0407 us | 0.0743 us | 2.019 us |
+| SubstitutionOnlyBufferingLong3distance | 2.819 us | 0.0559 us | 0.1285 us | 2.782 us |
+
+|                                 Method |     Mean |     Error |    StdDev |   Median |
+|--------------------------------------- |---------:|----------:|----------:|---------:|
+|         SubstitutionOnlyBufferingShort | 2.690 us | 0.0536 us | 0.1539 us | 2.720 us |
+|          SubstitutionOnlyBufferingLong | 2.042 us | 0.0405 us | 0.1074 us | 2.001 us |
+| SubstitutionOnlyBufferingLong3distance | 2.824 us | 0.0563 us | 0.1412 us | 2.754 us |
 
 
 
