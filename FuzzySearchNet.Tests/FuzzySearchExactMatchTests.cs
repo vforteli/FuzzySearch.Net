@@ -13,19 +13,21 @@ namespace FuzzySearchNet.Tests
 
             var results = (await FuzzySearch.FindAsync(word, stream, 0)).ToList();
 
-            Assert.That(results.Count, Is.EqualTo(3));
+            Assert.Multiple(() =>
+            {
+                Assert.That(results.Count, Is.EqualTo(3));
+                Assert.That(results[0].StartIndex, Is.EqualTo(0));
+                Assert.That(results[0].EndIndex, Is.EqualTo(3));
+                Assert.That(results[0].Match, Is.EqualTo(word));
 
-            Assert.That(results[0].StartIndex, Is.EqualTo(0));
-            Assert.That(results[0].EndIndex, Is.EqualTo(2));
-            Assert.That(results[0].Match, Is.EqualTo(word));
+                Assert.That(results[1].StartIndex, Is.EqualTo(12));
+                Assert.That(results[1].EndIndex, Is.EqualTo(15));
+                Assert.That(results[1].Match, Is.EqualTo(word));
 
-            Assert.That(results[1].StartIndex, Is.EqualTo(12));
-            Assert.That(results[1].EndIndex, Is.EqualTo(14));
-            Assert.That(results[1].Match, Is.EqualTo(word));
-
-            Assert.That(results[2].StartIndex, Is.EqualTo(19));
-            Assert.That(results[2].EndIndex, Is.EqualTo(21));
-            Assert.That(results[2].Match, Is.EqualTo(word));
+                Assert.That(results[2].StartIndex, Is.EqualTo(19));
+                Assert.That(results[2].EndIndex, Is.EqualTo(22));
+                Assert.That(results[2].Match, Is.EqualTo(word));
+            });
         }
 
         [Test]
@@ -49,12 +51,13 @@ namespace FuzzySearchNet.Tests
 
             var results = (await FuzzySearch.FindAsync(word, stream, 0)).ToList();
 
-            Assert.That(results.Count, Is.EqualTo(1));
-
-            Assert.That(results[0].StartIndex, Is.EqualTo(0));
-            Assert.That(results[0].EndIndex, Is.EqualTo(2));
-            Assert.That(results[0].Match, Is.EqualTo(word));
-
+            Assert.Multiple(() =>
+            {
+                Assert.That(results.Count, Is.EqualTo(1));
+                Assert.That(results[0].StartIndex, Is.EqualTo(0));
+                Assert.That(results[0].EndIndex, Is.EqualTo(3));
+                Assert.That(results[0].Match, Is.EqualTo(word));
+            });
         }
     }
 }

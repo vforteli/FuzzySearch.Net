@@ -49,7 +49,7 @@ public class FuzzySearch
             {
                 if (needlePosition == termLength)
                 {
-                    yield return new MatchResult(currentIndex - termLength, currentIndex, term);
+                    yield return new MatchResult(currentIndex - termLength, currentIndex + 1, 0, term);
                     needlePosition = 0;
                 }
                 else
@@ -68,15 +68,13 @@ public class FuzzySearch
 
 
     /// <summary>
-    /// Finds term in text with max distance 0, full match that is.
+    /// Finds term in text with only substitutions
     /// </summary>
     /// <param name="term"></param>
     /// <param name="text"></param>
     /// <returns></returns>
     public static async Task<IEnumerable<MatchResult>> FindSubstitutionsOnlyBuffering(string term, Stream text, int maxDistance)
     {
-        // foo--fo----f--f-oo--
-        // foo
         var matches = new List<MatchResult>();
 
         using var streamReader = new StreamReader(text);
@@ -85,7 +83,6 @@ public class FuzzySearch
         var needlePosition = 0;
         var termLengthMinusOne = term.Length - 1;
         var termLength = term.Length;
-        //var currentIndex = 0;
         var candidateDistance = 0;
         var termIndex = 0;
         var textStringLength = textString.Length;
@@ -109,21 +106,12 @@ public class FuzzySearch
 
             if (candidateDistance <= maxDistance)
             {
-                var endIndex = currentIndex + termLengthMinusOne;
-                matches.Add(new MatchResult(currentIndex, endIndex, textString.Substring(currentIndex, termLength)));
-            }            
+                matches.Add(new MatchResult(currentIndex, currentIndex + termLength, candidateDistance, textString.Substring(currentIndex, termLength)));
+            }
         }
 
         return matches;
     }
 }
 
-// todo hmm actually this could just be a dictionary
-public record CandidateMatch
-{
-    public int StartIndex { get; init; }
-    public int CurrentDistance { get; set; }
-    public string Match { get; set; } = "";
-}
-
-public record MatchResult(int StartIndex, int EndIndex, string Match);
+public record MatchResult(int StartIndex, int EndIndex, int Distance, string Match);
