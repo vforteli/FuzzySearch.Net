@@ -6,8 +6,16 @@ namespace FuzzySearchNet.Benchmark;
 public class BenchmarkFuzzySearch
 {
     private const string term = "foo";
+    private const string term2 = "fooo--foo-----fo";
     private const string text = "foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--";
 
     [Benchmark]
-    public async Task SubstitutionOnly() => await FuzzySearch.FindAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1);
+    public async Task SubstitutionOnlyBufferingShort() => await FuzzySearch.FindSubstitutionsOnlyBuffering(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1);
+
+    [Benchmark]
+    public async Task SubstitutionOnlyBufferingLong() => await FuzzySearch.FindSubstitutionsOnlyBuffering(term2, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1);
+
+
+    [Benchmark]
+    public async Task SubstitutionOnlyBufferingLong3distance() => await FuzzySearch.FindSubstitutionsOnlyBuffering(term2, new MemoryStream(Encoding.UTF8.GetBytes(text)), 3);
 }
