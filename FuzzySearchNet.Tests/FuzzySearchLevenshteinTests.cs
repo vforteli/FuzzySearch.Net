@@ -57,7 +57,6 @@ public class FuzzySearchLevenshteinTests
     }
 
 
-
     [Test]
     public void TestZeroMaxDistanceMultiple2()
     {
@@ -73,6 +72,35 @@ public class FuzzySearchLevenshteinTests
             Assert.That(results[0].StartIndex, Is.EqualTo(0));
             Assert.That(results[0].EndIndex, Is.EqualTo(5));
             Assert.That(results[0].Match, Is.EqualTo(text[0..5]));
+        });
+    }
+
+
+    [Test]
+    public void TestZeroMaxDistanceNoMatch()
+    {
+        var word = "pattern";
+        var text = "--paxxern--";
+
+        var results = FuzzySearch.Find(word, text, 1, false).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(0));
+        });
+    }
+
+    [Test]
+    public void TestZeroMaxDistanceNoMatch2()
+    {
+        var word = "pattern";
+        var text = "paxxern";
+
+        var results = FuzzySearch.Find(word, text, 1, false).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(0));
         });
     }
 
