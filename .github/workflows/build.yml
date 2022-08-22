@@ -30,5 +30,10 @@ jobs:
     - name: Pack
       run: dotnet pack -c Release --no-build --include-symbols --version-suffix build.${{github.run_number}}
           
-      
+    - name: Upload nuget package
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: nugetpackage
+        path: /**/*.nupkg
+     
       
