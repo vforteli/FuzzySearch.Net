@@ -2,8 +2,10 @@
 
 [![Build](https://github.com/vforteli/FuzzySearch.Net/actions/workflows/build.yml/badge.svg)](https://github.com/vforteli/FuzzySearch.Net/actions/workflows/build.yml)
 
-## Fuzzy search strings using levenshtein distance.   
-This package is inspired by fuzzysearch for python (https://github.com/taleinat/fuzzysearch) and to some extent follows the same conventions.
+## Fuzzy search strings using levenshtein distance.  
+This package can be used to search strings for sub sequences with a specified max levenshtein distance. Multiple matches with their indexes and distances will be returned if found.
+
+Inspired by fuzzysearch for python (https://github.com/taleinat/fuzzysearch) and to some extent follows the same conventions.
 
 # Installation
 Build from source or download NuGet package: https://www.nuget.org/packages/FuzzySearch.Net
@@ -16,10 +18,10 @@ Searching for strings in strings
   // Search with default options, substitutions, insertions, deletions and default maximum distance (3)
   var results = FuzzySearch.Find("sometext", "here is someteext for you");   
   
-   // Search with specified maximum distance
+  // Search with specified maximum distance
   var results = FuzzySearch.Find("sometext", "here is someteext for you", 1);  
     
-   // Search using only substitutions and default maximum distance (3)
+  // Search using only substitutions and default maximum distance (3)
   var results = FuzzySearch.Find("sometext", "here is someteext for you", SearchOptions.SubstitutionsOnly);  
   
   // Find returns a list of MatchResults with information about matches
