@@ -5,27 +5,27 @@ public class FuzzySearch
     /// <summary>
     /// Find instances of term in text up to maximum distance.
     /// </summary>
-    /// <param name="term"></param>
+    /// <param name="subSequence"></param>
     /// <param name="text"></param>
     /// <param name="maxDistance"></param>
-    public static IEnumerable<MatchResult> Find(string term, string text, int maxDistance = 3, bool substitutionsOnly = true)  // todo change this to enum or something..
+    public static IEnumerable<MatchResult> Find(string subSequence, string text, int maxDistance = 3, bool substitutionsOnly = true)  // todo change this to enum or something..
     {
-        if (string.IsNullOrEmpty(term))
+        if (string.IsNullOrEmpty(subSequence))
         {
-            throw new ArgumentException("Term cannot be null", nameof(term));
+            throw new ArgumentException("Term cannot be null", nameof(subSequence));
         }
 
         if (maxDistance == 0)
         {
-            return FindExact(term, text);
+            return FindExact(subSequence, text);
         }
         else if (substitutionsOnly)
         {
-            return FindSubstitutionsOnlyBuffering(term, text, maxDistance);
+            return FindSubstitutionsOnlyBuffering(subSequence, text, maxDistance);
         }
         else
         {
-            return FindBuffering(term, text, maxDistance);
+            return FindBuffering(subSequence, text, maxDistance);
         }
     }
 
@@ -33,21 +33,21 @@ public class FuzzySearch
     /// <summary>
     /// Finds term in text with max distance 0, full match that is.
     /// </summary>
-    /// <param name="term"></param>
+    /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    public static IEnumerable<MatchResult> FindExact(string term, string text)
+    public static IEnumerable<MatchResult> FindExact(string subSequence, string text)
     {
         var needlePosition = 0;
-        var termLength = term.Length - 1;
+        var termLength = subSequence.Length - 1;
         var currentIndex = 0;
 
         foreach (var currentCharacter in text)
         {
-            if (currentCharacter == term[needlePosition])
+            if (currentCharacter == subSequence[needlePosition])
             {
                 if (needlePosition == termLength)
                 {
-                    yield return new MatchResult(currentIndex - termLength, currentIndex + 1, 0, term, 0, 0, 0);
+                    yield return new MatchResult(currentIndex - termLength, currentIndex + 1, 0, subSequence, 0, 0, 0);
                     needlePosition = 0;
                 }
                 else
@@ -55,7 +55,7 @@ public class FuzzySearch
                     needlePosition++;
                 }
             }
-            else if (currentCharacter == term[0])
+            else if (currentCharacter == subSequence[0])
             {
                 needlePosition = 1;
             }
@@ -72,15 +72,15 @@ public class FuzzySearch
     /// <summary>
     /// Finds term in text with only substitutions
     /// </summary>
-    /// <param name="term"></param>
+    /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    public static IEnumerable<MatchResult> FindSubstitutionsOnlyBuffering(string term, string text, int maxDistance)
+    public static IEnumerable<MatchResult> FindSubstitutionsOnlyBuffering(string subSequence, string text, int maxDistance)
     {
         var matches = new List<MatchResult>();
 
         var needlePosition = 0;
-        var termLengthMinusOne = term.Length - 1;
-        var termLength = term.Length;
+        var termLengthMinusOne = subSequence.Length - 1;
+        var termLength = subSequence.Length;
         var candidateDistance = 0;
         var termIndex = 0;
         var textStringLength = text.Length;
@@ -92,7 +92,7 @@ public class FuzzySearch
 
             for (termIndex = 0; termIndex < termLength; termIndex++)
             {
-                if (text[needlePosition] != term[termIndex])
+                if (text[needlePosition] != subSequence[termIndex])
                 {
                     candidateDistance++;
                     if (candidateDistance > maxDistance)
@@ -117,14 +117,14 @@ public class FuzzySearch
     /// <summary>
     /// Finds term in text with max distance
     /// </summary>
-    /// <param name="term"></param>
+    /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    public static IEnumerable<MatchResult> FindBuffering(string term, string text, int maxDistance)
+    public static IEnumerable<MatchResult> FindBuffering(string subSequence, string text, int maxDistance)
     {
         var matches = new List<MatchResult>();
 
-        var termLengthMinusOne = term.Length - 1;
-        var termLength = term.Length;
+        var termLengthMinusOne = subSequence.Length - 1;
+        var termLength = subSequence.Length;
         var textStringLength = text.Length;
 
         var candidates = new Stack<CandidateMatch>();
@@ -135,6 +135,7 @@ public class FuzzySearch
 
             // Keep track of the best distance so far, this means we can ignore candidates with higher distance if we already have a match
             var bestFoundDistance = maxDistance;
+
             while (candidates.TryPop(out var candidate))
             {
 
@@ -160,7 +161,7 @@ public class FuzzySearch
                 }
 
 
-                if (text[candidate.TextIndex] == term[candidate.PatternIndex])
+                if (text[candidate.TextIndex] == subSequence[candidate.PatternIndex])
                 {
                     candidates.Push(new CandidateMatch(candidate.StartIndex, candidate.TextIndex + 1, candidate.PatternIndex + 1, candidate.Distance, candidate.Deletions, candidate.Substitutions, candidate.Insertions));
                     if (candidate.Distance < bestFoundDistance)
@@ -210,10 +211,6 @@ public class FuzzySearch
             }
         }
 
-        // todo figure out some sane way of removing overlapping matches...
-        // this is just here to make tests green... then we can optimize
-        //var derp = matches.Distinct().OrderBy(o => o.Distance).ToList();
-
         matches = matches.Distinct().ToList();
 
         if (matches.Count > 1)
@@ -247,5 +244,3 @@ public class FuzzySearch
         }
     }
 }
-
-public record struct CandidateMatch(int StartIndex, int TextIndex, int PatternIndex, int Distance, int Deletions, int Substitutions, int Insertions);

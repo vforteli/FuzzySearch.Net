@@ -1,5 +1,8 @@
 namespace FuzzySearchNet.Tests;
 
+/// <summary>
+/// Testing with similar tests as https://github.com/taleinat/fuzzysearch to ensure somewhat compatible behaviour
+/// </summary>
 public class FuzzySearchLevenshteinTests
 {
     [TestCase("PATTERN", "PATTERN", 0, 0, 7, 0)]
