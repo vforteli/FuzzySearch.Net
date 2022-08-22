@@ -34,6 +34,6 @@ jobs:
       uses: actions/upload-artifact@v3.1.0
       with:
         name: nugetpackage
-        path: /**/*.nupkg
+        path: FuzzySearch.Net/FuzzySearch.Net/FuzzySearchNet/bin/Release/**/*.nupkg
      
       
