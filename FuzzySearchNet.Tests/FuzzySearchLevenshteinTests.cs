@@ -228,4 +228,42 @@ public class FuzzySearchLevenshteinTests
             Assert.That(results[1].Match, Is.EqualTo(text[8..14]));
         });
     }
+
+    [TestCase("PATTERN", "")]
+    [TestCase("", "sometext")]
+    [TestCase("", "")]
+    public void TestEmpty(string pattern, string text)
+    {
+        var results = FuzzySearch.Find(pattern, text, 2, false).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(0));
+        });
+    }
+
+    [TestCase("PATTERN", "PATERN", 1)]
+    public void TestShorterText(string pattern, string text, int expectedMatches)
+    {
+        var results = FuzzySearch.Find(pattern, text, 1, false).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(expectedMatches));
+            Assert.That(results[0].StartIndex, Is.EqualTo(0));
+            Assert.That(results[0].EndIndex, Is.EqualTo(text.Length));
+            Assert.That(results[0].Match, Is.EqualTo(text[0..text.Length]));
+        });
+    }
+
+    [TestCase("PATTERN", "PAERN", 0)]
+    public void TestShorterTextNoMatch(string pattern, string text, int expectedMatches)
+    {
+        var results = FuzzySearch.Find(pattern, text, 1, false).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(expectedMatches));
+        });
+    }
 }

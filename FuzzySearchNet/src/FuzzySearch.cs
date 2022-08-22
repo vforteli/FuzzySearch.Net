@@ -3,7 +3,7 @@ namespace FuzzySearchNet;
 public class FuzzySearch
 {
     /// <summary>
-    /// Find instances of term in text up to maximum distance.
+    /// Find instances of sub sequence in text up to maximum distance.
     /// </summary>
     /// <param name="subSequence"></param>
     /// <param name="text"></param>
@@ -12,7 +12,7 @@ public class FuzzySearch
     {
         if (string.IsNullOrEmpty(subSequence))
         {
-            throw new ArgumentException("Term cannot be null", nameof(subSequence));
+            return new List<MatchResult>();
         }
 
         if (maxDistance == 0)
