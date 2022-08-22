@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using System.Text;
 
 namespace FuzzySearchNet.Benchmark;
 
@@ -10,12 +9,12 @@ public class BenchmarkFuzzySearch
     private const string text = "foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--";
 
     [Benchmark]
-    public async Task SubstitutionOnlyBufferingShort() => await FuzzySearch.FindSubstitutionsOnlyBufferingAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1);
+    public void SubstitutionOnlyBufferingShort() => FuzzySearch.FindSubstitutionsOnlyBuffering(term, text, 1);
 
     [Benchmark]
-    public async Task SubstitutionOnlyBufferingLong() => await FuzzySearch.FindSubstitutionsOnlyBufferingAsync(term2, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1);
+    public void SubstitutionOnlyBufferingLong() => FuzzySearch.FindSubstitutionsOnlyBuffering(term2, text, 1);
 
 
     [Benchmark]
-    public async Task SubstitutionOnlyBufferingLong3distance() => await FuzzySearch.FindSubstitutionsOnlyBufferingAsync(term2, new MemoryStream(Encoding.UTF8.GetBytes(text)), 3);
+    public void SubstitutionOnlyBufferingLong3distance() => FuzzySearch.FindSubstitutionsOnlyBuffering(term2, text, 3);
 }
