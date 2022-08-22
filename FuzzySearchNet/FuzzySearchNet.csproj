@@ -24,6 +24,8 @@
     <PackageLicense>https://github.com/vforteli/FuzzySearch.Net/blob/main/LICENSE.md</PackageLicense>
     <PackageReleaseNotes>Clean up public methods, fix some bugs</PackageReleaseNotes>
     <PackageTags>fuzzy search;levenshtein distance;dotnet;.net;c#;fuzzysearch.net</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
 </Project>

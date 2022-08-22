@@ -28,7 +28,7 @@ jobs:
       run: dotnet test -c Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
       
     - name: Pack
-      run: dotnet pack -c Release --no-build --include-symbols --version-suffix build.${{github.run_number}}
+      run: dotnet pack -c Release --no-build --version-suffix build.${{github.run_number}}
           
     - name: Upload nuget package
       if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
