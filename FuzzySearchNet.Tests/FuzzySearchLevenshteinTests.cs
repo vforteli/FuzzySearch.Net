@@ -18,7 +18,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("1234567", "-----23567", 2, 4, 10, 2)]
     public void TestSingleMatchWithDeletions(string pattern, string text, int maxDistance, int expectedStart, int expectedEnd, int expectedDistance)
     {
-        var results = FuzzySearch.Find(pattern, text, maxDistance, false).ToList();
+        var results = FuzzySearch.Find(pattern, text, maxDistance).ToList();
 
         Assert.Multiple(() =>
         {
@@ -43,7 +43,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("PATTERN", "----------PATTERNN---------", 2, 10, 17, 0)]
     public void TestSingleMatchWithInsertion(string pattern, string text, int maxDistance, int expectedStart, int expectedEnd, int expectedDistance)
     {
-        var results = FuzzySearch.Find(pattern, text, maxDistance, false).ToList();
+        var results = FuzzySearch.Find(pattern, text, maxDistance).ToList();
 
         Assert.Multiple(() =>
         {
@@ -63,7 +63,7 @@ public class FuzzySearchLevenshteinTests
         var word = "pattern";
         var text = "atern----";
 
-        var results = FuzzySearch.Find(word, text, 2, false).ToList();
+        var results = FuzzySearch.Find(word, text, 2).ToList();
 
         Assert.Multiple(() =>
         {
@@ -82,7 +82,7 @@ public class FuzzySearchLevenshteinTests
         var word = "pattern";
         var text = "--paxxern--";
 
-        var results = FuzzySearch.Find(word, text, 1, false).ToList();
+        var results = FuzzySearch.Find(word, text, 1).ToList();
 
         Assert.Multiple(() =>
         {
@@ -96,7 +96,7 @@ public class FuzzySearchLevenshteinTests
         var word = "pattern";
         var text = "paxxern";
 
-        var results = FuzzySearch.Find(word, text, 1, false).ToList();
+        var results = FuzzySearch.Find(word, text, 1).ToList();
 
         Assert.Multiple(() =>
         {
@@ -111,7 +111,7 @@ public class FuzzySearchLevenshteinTests
         var word = "pattern";
         var text = "patern----";
 
-        var results = FuzzySearch.Find(word, text, 1, false).ToList();
+        var results = FuzzySearch.Find(word, text, 1).ToList();
 
         Assert.Multiple(() =>
         {
@@ -129,7 +129,7 @@ public class FuzzySearchLevenshteinTests
         var word = "pattern";
         var text = "--patern--";
 
-        var results = FuzzySearch.Find(word, text, 1, false).ToList();
+        var results = FuzzySearch.Find(word, text, 1).ToList();
 
         Assert.Multiple(() =>
         {
@@ -147,7 +147,7 @@ public class FuzzySearchLevenshteinTests
         var word = "pattern";
         var text = "--patternpattern--";
 
-        var results = FuzzySearch.Find(word, text, 2, false).ToList();
+        var results = FuzzySearch.Find(word, text, 2).ToList();
 
         Assert.Multiple(() =>
         {
@@ -169,7 +169,7 @@ public class FuzzySearchLevenshteinTests
         var word = "pattern";
         var text = "--pattern-pattern--";
 
-        var results = FuzzySearch.Find(word, text, 1, false).ToList();
+        var results = FuzzySearch.Find(word, text, 1).ToList();
 
         Assert.Multiple(() =>
         {
@@ -191,7 +191,7 @@ public class FuzzySearchLevenshteinTests
         var word = "pattern";
         var text = "--pattermpatyern--";
 
-        var results = FuzzySearch.Find(word, text, 2, false).ToList();
+        var results = FuzzySearch.Find(word, text, 2).ToList();
 
         Assert.Multiple(() =>
         {
@@ -213,7 +213,7 @@ public class FuzzySearchLevenshteinTests
         var word = "pattern";
         var text = "--pattrnpttern--";
 
-        var results = FuzzySearch.Find(word, text, 2, false).ToList();
+        var results = FuzzySearch.Find(word, text, 2).ToList();
 
         Assert.Multiple(() =>
         {
@@ -234,7 +234,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("", "")]
     public void TestEmpty(string pattern, string text)
     {
-        var results = FuzzySearch.Find(pattern, text, 2, false).ToList();
+        var results = FuzzySearch.Find(pattern, text, 2).ToList();
 
         Assert.Multiple(() =>
         {
@@ -245,7 +245,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("PATTERN", "PATERN", 1)]
     public void TestShorterText(string pattern, string text, int expectedMatches)
     {
-        var results = FuzzySearch.Find(pattern, text, 1, false).ToList();
+        var results = FuzzySearch.Find(pattern, text, 1).ToList();
 
         Assert.Multiple(() =>
         {
@@ -259,7 +259,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("PATTERN", "PAERN", 0)]
     public void TestShorterTextNoMatch(string pattern, string text, int expectedMatches)
     {
-        var results = FuzzySearch.Find(pattern, text, 1, false).ToList();
+        var results = FuzzySearch.Find(pattern, text, 1).ToList();
 
         Assert.Multiple(() =>
         {

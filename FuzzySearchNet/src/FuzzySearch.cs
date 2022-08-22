@@ -3,12 +3,38 @@ namespace FuzzySearchNet;
 public class FuzzySearch
 {
     /// <summary>
+    /// Find instances of sub sequence in text up to default maximum distance 3.
+    /// </summary>
+    /// <param name="subSequence"></param>
+    /// <param name="text"></param>    
+    public static IEnumerable<MatchResult> Find(string subSequence, string text) => Find(subSequence, text, 3, SearchOptions.None);
+
+
+    /// <summary>
+    /// Find instances of sub sequence in text up to default maximum distance 3 and search mode.
+    /// </summary>
+    /// <param name="subSequence"></param>
+    /// <param name="text"></param>    
+    /// <param name="searchMode"></param>
+    public static IEnumerable<MatchResult> Find(string subSequence, string text, SearchOptions searchMode) => Find(subSequence, text, 3, searchMode);
+
+
+    /// <summary>
+    /// Find instances of sub sequence in text up to maximum maximum distance.
+    /// </summary>
+    /// <param name="subSequence"></param>
+    /// <param name="text"></param>    
+    /// <param name="searchMode"></param>
+    public static IEnumerable<MatchResult> Find(string subSequence, string text, int maxDistance) => Find(subSequence, text, maxDistance, SearchOptions.None);
+
+
+    /// <summary>
     /// Find instances of sub sequence in text up to maximum distance.
     /// </summary>
     /// <param name="subSequence"></param>
     /// <param name="text"></param>
     /// <param name="maxDistance"></param>
-    public static IEnumerable<MatchResult> Find(string subSequence, string text, int maxDistance = 3, bool substitutionsOnly = true)  // todo change this to enum or something..
+    public static IEnumerable<MatchResult> Find(string subSequence, string text, int maxDistance, SearchOptions searchMode)
     {
         if (string.IsNullOrEmpty(subSequence))
         {
@@ -19,7 +45,7 @@ public class FuzzySearch
         {
             return FindExact(subSequence, text);
         }
-        else if (substitutionsOnly)
+        else if (searchMode == SearchOptions.SubstitutionsOnly)
         {
             return FindSubstitutionsOnlyBuffering(subSequence, text, maxDistance);
         }
@@ -37,6 +63,7 @@ public class FuzzySearch
     /// <param name="text"></param>    
     public static IEnumerable<MatchResult> FindExact(string subSequence, string text)
     {
+        // ok so this whole method is a bit redundant... but the idea is to have this using a stream instead of text... later
         var needlePosition = 0;
         var termLength = subSequence.Length - 1;
         var currentIndex = 0;
@@ -47,7 +74,17 @@ public class FuzzySearch
             {
                 if (needlePosition == termLength)
                 {
-                    yield return new MatchResult(currentIndex - termLength, currentIndex + 1, 0, subSequence, 0, 0, 0);
+                    yield return new MatchResult
+                    {
+                        StartIndex = currentIndex - termLength,
+                        EndIndex = currentIndex + 1,
+                        Distance = 0,
+                        Match = subSequence,
+                        Deletions = 0,
+                        Substitutions = 0,
+                        Insertions = 0,
+                    };
+
                     needlePosition = 0;
                 }
                 else
@@ -106,7 +143,16 @@ public class FuzzySearch
 
             if (candidateDistance <= maxDistance)
             {
-                matches.Add(new MatchResult(currentIndex, currentIndex + termLength, candidateDistance, text.Substring(currentIndex, termLength), 0, candidateDistance, 0));
+                matches.Add(new MatchResult
+                {
+                    StartIndex = currentIndex,
+                    EndIndex = currentIndex + termLength,
+                    Distance = candidateDistance,
+                    Match = text[currentIndex..(currentIndex + termLength)],
+                    Deletions = 0,
+                    Substitutions = candidateDistance,
+                    Insertions = 0,
+                });
             }
         }
 
@@ -142,7 +188,17 @@ public class FuzzySearch
 
                 if (candidate.PatternIndex == termLength && candidate.Distance <= bestFoundDistance)
                 {
-                    matches.Add(new MatchResult(candidate.StartIndex, candidate.TextIndex, candidate.Distance, text[candidate.StartIndex..candidate.TextIndex], candidate.Deletions, candidate.Substitutions, candidate.Insertions));
+                    matches.Add(new MatchResult
+                    {
+                        StartIndex = candidate.StartIndex,
+                        EndIndex = candidate.TextIndex,
+                        Distance = candidate.Distance,
+                        Match = text[candidate.StartIndex..candidate.TextIndex],
+                        Deletions = candidate.Deletions,
+                        Substitutions = candidate.Substitutions,
+                        Insertions = candidate.Insertions,
+                    });
+
                     bestFoundDistance = candidate.Distance;
 
                     // No point searching for better matches if we find a perfect match

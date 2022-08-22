@@ -13,7 +13,7 @@
 
   <PropertyGroup>
     <PackageId>FuzzySearch.Net</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Title>FuzzySearch.Net</Title>
     <Authors>Verner Fortelius</Authors>
     <Description>Fuzzy search library for finding strings in strings. Inspired by and attempts to be somewhat compatible with fuzzysearch for python https://github.com/taleinat/fuzzysearch</Description>
@@ -22,7 +22,7 @@
     <PackageProjectUrl>https://github.com/vforteli/FuzzySearch.Net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/vforteli/FuzzySearch.Net</RepositoryUrl>
     <PackageLicense>https://github.com/vforteli/FuzzySearch.Net/blob/main/LICENSE.md</PackageLicense>
-    <PackageReleaseNotes>Sort of working initial release without much optimization or verification</PackageReleaseNotes>
+    <PackageReleaseNotes>Clean up public methods, fix some bugs</PackageReleaseNotes>
     <PackageTags>fuzzy search;levenshtein distance;dotnet;.net;c#;fuzzysearch.net</PackageTags>
   </PropertyGroup>
 

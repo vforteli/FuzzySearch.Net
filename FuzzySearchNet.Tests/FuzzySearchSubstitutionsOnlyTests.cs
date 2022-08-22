@@ -8,7 +8,7 @@ public class FuzzySearchSubstitutionsOnlyTests
         var word = "foo";
         var text = "foo--fo----f--f-oo";
 
-        var results = FuzzySearch.Find(word, text, 1).ToList();
+        var results = FuzzySearch.Find(word, text, 1, SearchOptions.SubstitutionsOnly).ToList();
 
         Assert.Multiple(() =>
         {
@@ -38,7 +38,7 @@ public class FuzzySearchSubstitutionsOnlyTests
         var word = "foo";
         var text = "f-------f----o---f---o-o--";
 
-        var results = FuzzySearch.Find(word, text, 1).ToList();
+        var results = FuzzySearch.Find(word, text, 1, SearchOptions.SubstitutionsOnly).ToList();
 
         Assert.That(results.Count, Is.EqualTo(0));
     }
@@ -49,7 +49,7 @@ public class FuzzySearchSubstitutionsOnlyTests
         var word = "foo";
         var text = "foo";
 
-        var results = FuzzySearch.Find(word, text, 1).ToList();
+        var results = FuzzySearch.Find(word, text, 1, SearchOptions.SubstitutionsOnly).ToList();
 
         Assert.Multiple(() =>
         {
@@ -67,7 +67,7 @@ public class FuzzySearchSubstitutionsOnlyTests
         var pattern = "TGCACTGTAGGGATAACAAT";
         var text = "GACTAGCACTGTAGGGATAACAATTTCACACAGGTGGACAATTACATTGAAAATCACAGATTGGTCACACACACATTGGACATACATAGAAACACACACACATACATTAGATACGAACATAGAAACACACATTAGACGCGTACATAGACACAAACACATTGACAGGCAGTTCAGATGATGACGCCCGACTGATACTCGCGTAGTCGTGGGAGGCAAGGCACACAGGGGATAGG";
 
-        var results = FuzzySearch.Find(pattern, text, 2).ToList();
+        var results = FuzzySearch.Find(pattern, text, 2, SearchOptions.SubstitutionsOnly).ToList();
 
         Assert.Multiple(() =>
         {
@@ -86,7 +86,7 @@ public class FuzzySearchSubstitutionsOnlyTests
         var pattern = "GGGTTLTTSS";
         var text = "XXXXXXXXXXXXXXXXXXXGGGTTVTTSSAAAAAAAAAAAAAGGGTTLTTSSAAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBBBBGGGTTLTTSS";
 
-        var results = FuzzySearch.Find(pattern, text, 0).ToList();
+        var results = FuzzySearch.Find(pattern, text, 0, SearchOptions.SubstitutionsOnly).ToList();
 
         Assert.Multiple(() =>
         {
@@ -101,7 +101,7 @@ public class FuzzySearchSubstitutionsOnlyTests
             Assert.That(results[1].Match, Is.EqualTo(text[99..109]));
         });
 
-        var results2 = FuzzySearch.Find(pattern, text, 1).ToList();
+        var results2 = FuzzySearch.Find(pattern, text, 1, SearchOptions.SubstitutionsOnly).ToList();
 
         Assert.Multiple(() =>
         {
@@ -120,7 +120,7 @@ public class FuzzySearchSubstitutionsOnlyTests
             Assert.That(results2[2].Match, Is.EqualTo(text[99..109]));
         });
 
-        var results3 = FuzzySearch.Find(pattern, text, 2).ToList();
+        var results3 = FuzzySearch.Find(pattern, text, 2, SearchOptions.SubstitutionsOnly).ToList();
 
         Assert.Multiple(() =>
         {
