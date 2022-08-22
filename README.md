@@ -4,3 +4,5 @@
 
 Fuzzy search strings.   
 This package is inspired by fuzzysearch for python and to some extent follows the same conventions.
+
+NuGet package https://www.nuget.org/packages/FuzzySearch.Net
