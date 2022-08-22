@@ -1070,7 +1070,7 @@
           "System.Xml.XPath": "4.3.0"
         }
       },
-      "fuzzysearchnet": {
+      "FuzzySearch.Net": {
         "type": "Project"
       }
     }
