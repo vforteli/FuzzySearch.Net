@@ -168,20 +168,14 @@ public class FuzzySearch
     public static IEnumerable<MatchResult> FindSubstitutionsOnlyBuffering(string subSequence, string text, int maxDistance)
     {
         var matches = new List<MatchResult>();
-
-        var needlePosition = 0;
         var termLengthMinusOne = subSequence.Length - 1;
-        var termLength = subSequence.Length;
-        var candidateDistance = 0;
-        var termIndex = 0;
-        var textStringLength = text.Length;
 
-        for (var currentIndex = 0; currentIndex < textStringLength - termLengthMinusOne; currentIndex++)
+        for (var currentIndex = 0; currentIndex < text.Length - termLengthMinusOne; currentIndex++)
         {
-            needlePosition = currentIndex;
-            candidateDistance = 0;
+            var needlePosition = currentIndex;
+            var candidateDistance = 0;
 
-            for (termIndex = 0; termIndex < termLength; termIndex++)
+            for (var termIndex = 0; termIndex < subSequence.Length; termIndex++)
             {
                 if (text[needlePosition] != subSequence[termIndex])
                 {
@@ -200,9 +194,9 @@ public class FuzzySearch
                 matches.Add(new MatchResult
                 {
                     StartIndex = currentIndex,
-                    EndIndex = currentIndex + termLength,
+                    EndIndex = currentIndex + subSequence.Length,
                     Distance = candidateDistance,
-                    Match = text[currentIndex..(currentIndex + termLength)],
+                    Match = text[currentIndex..(currentIndex + subSequence.Length)],
                     Deletions = 0,
                     Substitutions = candidateDistance,
                     Insertions = 0,
