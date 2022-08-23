@@ -1,4 +1,4 @@
-namespace FuzzySearchNet.Tests;
+namespace FuzzySearchNet.Tests.Tests;
 
 public class FuzzySearchSubstitutionsOnlyTests
 {
@@ -137,6 +137,19 @@ public class FuzzySearchSubstitutionsOnlyTests
             Assert.That(results3[2].StartIndex, Is.EqualTo(99));
             Assert.That(results3[2].EndIndex, Is.EqualTo(109));
             Assert.That(results3[2].Match, Is.EqualTo(text[99..109]));
+        });
+    }
+
+    [TestCase("", "")]
+    [TestCase("", "foo")]
+    [TestCase("foo", "")]
+    public void TestZeroMaxDistanceEmpty(string word, string text)
+    {
+        var results = FuzzySearch.Find(word, text, SearchOptions.SubstitutionsOnly).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(0));
         });
     }
 }

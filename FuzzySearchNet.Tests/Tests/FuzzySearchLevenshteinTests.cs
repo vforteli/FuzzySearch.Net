@@ -1,4 +1,4 @@
-namespace FuzzySearchNet.Tests;
+namespace FuzzySearchNet.Tests.Tests;
 
 /// <summary>
 /// Testing with similar tests as https://github.com/taleinat/fuzzysearch to ensure somewhat compatible behaviour

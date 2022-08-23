@@ -168,14 +168,9 @@ public class FuzzySearch
     public static IEnumerable<MatchResult> FindBuffering(string subSequence, string text, int maxDistance)
     {
         var matches = new List<MatchResult>();
-
-        var termLengthMinusOne = subSequence.Length - 1;
-        var termLength = subSequence.Length;
-        var textStringLength = text.Length;
-
         var candidates = new Stack<CandidateMatch>();
 
-        for (var currentIndex = 0; currentIndex <= textStringLength - termLengthMinusOne; currentIndex++)
+        for (var currentIndex = 0; currentIndex <= text.Length - (subSequence.Length - 1); currentIndex++)
         {
             candidates.Push(new CandidateMatch(currentIndex, currentIndex, 0, 0, 0, 0, 0));
 
@@ -184,9 +179,7 @@ public class FuzzySearch
 
             while (candidates.TryPop(out var candidate))
             {
-
-
-                if (candidate.PatternIndex == termLength && candidate.Distance <= bestFoundDistance)
+                if (candidate.PatternIndex == subSequence.Length && candidate.Distance <= bestFoundDistance)
                 {
                     matches.Add(new MatchResult
                     {
@@ -211,15 +204,15 @@ public class FuzzySearch
                     continue;
                 }
 
-                if (candidate.TextIndex == textStringLength)
+                if (candidate.TextIndex == text.Length)
                 {
                     continue;
                 }
 
-
                 if (text[candidate.TextIndex] == subSequence[candidate.PatternIndex])
                 {
                     candidates.Push(new CandidateMatch(candidate.StartIndex, candidate.TextIndex + 1, candidate.PatternIndex + 1, candidate.Distance, candidate.Deletions, candidate.Substitutions, candidate.Insertions));
+
                     if (candidate.Distance < bestFoundDistance)
                     {
                         candidates.Push(candidate with
@@ -291,8 +284,7 @@ public class FuzzySearch
                 match = currentMatch;
             }
 
-            var foo = groups.Select(o => o.OrderBy(o => o.Distance).ThenByDescending(o => o.Match.Length).First()).ToList();
-            return foo;
+            return groups.Select(o => o.OrderBy(o => o.Distance).ThenByDescending(o => o.Match.Length).First()).ToList();
         }
         else
         {

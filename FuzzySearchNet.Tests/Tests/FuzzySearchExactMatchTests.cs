@@ -1,4 +1,4 @@
-namespace FuzzySearchNet.Tests;
+namespace FuzzySearchNet.Tests.Tests;
 
 public class FuzzySearchExactMatchTests
 {
@@ -52,6 +52,19 @@ public class FuzzySearchExactMatchTests
             Assert.That(results[0].StartIndex, Is.EqualTo(0));
             Assert.That(results[0].EndIndex, Is.EqualTo(3));
             Assert.That(results[0].Match, Is.EqualTo(word));
+        });
+    }
+
+    [TestCase("", "")]
+    [TestCase("", "foo")]
+    [TestCase("foo", "")]
+    public void TestZeroMaxDistanceEmpty(string word, string text)
+    {
+        var results = FuzzySearch.Find(word, text, 0).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(0));
         });
     }
 }
