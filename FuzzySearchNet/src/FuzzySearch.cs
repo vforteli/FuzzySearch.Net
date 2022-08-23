@@ -209,6 +209,68 @@ public class FuzzySearch
 
 
     /// <summary>
+    /// Finds term in text with only substitutions from stream
+    /// </summary>
+    /// <param name="subSequence"></param>
+    /// <param name="text"></param>    
+    public static async Task<IEnumerable<MatchResult>> FindSubstitutionsOnlyAsync(string subSequence, Stream textStream, int maxDistance, int bufferSize = 4096)
+    {
+        var matches = new List<MatchResult>();
+        var termLengthMinusOne = subSequence.Length - 1;
+
+        // todo buffer size must be larger than um, something
+        var buffer = new char[bufferSize];
+        using var streamReader = new StreamReader(textStream);
+
+        var streamIndexOffset = 0;
+
+        while (!streamReader.EndOfStream)
+        {
+            // todo have to overlap with the previous buffer to ensure matches can be retrieved
+            var bytesRead = await streamReader.ReadBlockAsync(buffer, 0, buffer.Length);
+
+            for (var currentIndex = 0; currentIndex < buffer.Length - termLengthMinusOne; currentIndex++)
+            {
+                var needlePosition = currentIndex;
+                var candidateDistance = 0;
+
+                for (var termIndex = 0; termIndex < subSequence.Length; termIndex++)
+                {
+                    if (buffer[needlePosition] != subSequence[termIndex])
+                    {
+                        candidateDistance++;
+                        if (candidateDistance > maxDistance)
+                        {
+                            break;
+                        }
+                    }
+
+                    needlePosition++;
+                }
+
+                if (candidateDistance <= maxDistance)
+                {
+                    matches.Add(new MatchResult
+                    {
+                        StartIndex = currentIndex,
+                        EndIndex = currentIndex + subSequence.Length,
+                        Distance = candidateDistance,
+                        Match = new string(buffer[currentIndex..(currentIndex + subSequence.Length)]),
+                        Deletions = 0,
+                        Substitutions = candidateDistance,
+                        Insertions = 0,
+                    });
+                }
+            }
+
+            streamIndexOffset += bytesRead;
+        }
+
+        return matches;
+    }
+
+
+    /// <summary>
     /// Finds term in text with max distance
     /// </summary>
     /// <param name="subSequence"></param>
