@@ -1,6 +1,4 @@
-using System.Text;
-
-namespace FuzzySearchNet.Tests.Tests;
+namespace FuzzySearchNet.Tests;
 
 public class FuzzySearchStreamExactMatchTests
 {

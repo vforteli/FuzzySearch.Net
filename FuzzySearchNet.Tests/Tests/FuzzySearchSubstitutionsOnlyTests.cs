@@ -1,4 +1,4 @@
-namespace FuzzySearchNet.Tests.Tests;
+namespace FuzzySearchNet.Tests;
 
 public class FuzzySearchSubstitutionsOnlyTests
 {

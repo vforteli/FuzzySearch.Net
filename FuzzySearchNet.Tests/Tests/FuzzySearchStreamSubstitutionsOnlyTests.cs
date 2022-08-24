@@ -1,41 +1,38 @@
-using System.Text;
-
-namespace FuzzySearchNet.Tests.Tests;
+namespace FuzzySearchNet.Tests;
 
 public class FuzzySearchStreamSubstitutionsOnlyTests
 {
     [Test]
-    public async Task TestZeroMaxDistanceMultiple()
+    public async Task TestSubstitutionOnlyMultiple()
     {
         var word = "foo";
-        var text = new MemoryStream(Encoding.UTF8.GetBytes("foo-----fo--foo-f--fooo--"));
+        var text = "foo-----fo--foo-f--fooo--";
+        var textStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
 
-        var results = (await FuzzySearch.FindExactAsync(word, text)).ToList();
+        var results = (await FuzzySearch.FindSubstitutionsOnlyAsync(word, textStream, 1)).ToList();
 
         Assert.Multiple(() =>
         {
-            Assert.That(results.Count, Is.EqualTo(3));
-            Assert.That(results[0].StartIndex, Is.EqualTo(0));
-            Assert.That(results[0].EndIndex, Is.EqualTo(3));
-            Assert.That(results[0].Match, Is.EqualTo(word));
+            Assert.That(results.Count, Is.EqualTo(5));
 
-            Assert.That(results[1].StartIndex, Is.EqualTo(12));
-            Assert.That(results[1].EndIndex, Is.EqualTo(15));
-            Assert.That(results[1].Match, Is.EqualTo(word));
-
-            Assert.That(results[2].StartIndex, Is.EqualTo(19));
-            Assert.That(results[2].EndIndex, Is.EqualTo(22));
-            Assert.That(results[2].Match, Is.EqualTo(word));
+            TestUtils.AssertMatch(results[0], 0, 3, text);
+            TestUtils.AssertMatch(results[1], 8, 11, text);
+            TestUtils.AssertMatch(results[2], 12, 15, text);
+            TestUtils.AssertMatch(results[3], 19, 22, text);
+            TestUtils.AssertMatch(results[4], 20, 23, text);    // todo this is a bit hohum... do we want to consolidate these or not?
         });
     }
 
-    [TestCase("pattern", "--------patfern-------------", 0)]
-    [TestCase("pattern", "---------patfern------------", 1)]
-    [TestCase("pattern", "----------patfern-----------", 2)]
-    [TestCase("pattern", "-----------patfern----------", 3)]
-    [TestCase("pattern", "---------------patfern------", 7)]
-    [TestCase("pattern", "----------------patfern-----", 8)]
-    public async Task TestZeroMaxDistanceBufferBoundary(string term, string text, int expectedStartIndex)
+    [TestCase("pattern", "patfern---------------------", 0)]
+    [TestCase("pattern", "--------patfern-------------", 8)]
+    [TestCase("pattern", "---------patfern------------", 9)]
+    [TestCase("pattern", "----------patfern-----------", 10)]
+    [TestCase("pattern", "-----------patfern----------", 11)]
+    [TestCase("pattern", "---------------patfern------", 15)]
+    [TestCase("pattern", "----------------patfern-----", 16)]
+    [TestCase("pattern", "-----------------patfern----", 17)]
+    [TestCase("pattern", "---------------------patfern", 21)]
+    public async Task TestSubstitutionOnlyBufferBoundary(string term, string text, int expectedStartIndex)
     {
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
         var results = (await FuzzySearch.FindSubstitutionsOnlyAsync(term, stream, 1, 16)).ToList();
@@ -43,9 +40,25 @@ public class FuzzySearchStreamSubstitutionsOnlyTests
         Assert.Multiple(() =>
         {
             Assert.That(results.Count, Is.EqualTo(1));
-            Assert.That(results[0].StartIndex, Is.EqualTo(expectedStartIndex + 8));
-            Assert.That(results[0].EndIndex, Is.EqualTo(expectedStartIndex + 8 + term.Length));
+            Assert.That(results[0].StartIndex, Is.EqualTo(expectedStartIndex));
+            Assert.That(results[0].EndIndex, Is.EqualTo(expectedStartIndex + term.Length));
             Assert.That(results[0].Match, Is.EqualTo("patfern"));
+        });
+    }
+
+    [Test]
+    public async Task TestSubstitutionOnlyTermLongerThanBuffer()
+    {
+        var text = "------------------------thisislongerthanthebufferandshouldntexplode---------------------";
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        var term = "thisislongerthanthebufferandshouldntexplode";
+
+        var results = (await FuzzySearch.FindSubstitutionsOnlyAsync(term, stream, 1, 16)).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(1));
+            TestUtils.AssertMatch(results[0], 24, 24 + term.Length, text);
         });
     }
 }
