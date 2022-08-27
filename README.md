@@ -10,6 +10,7 @@ Inspired by fuzzysearch for python (https://github.com/taleinat/fuzzysearch) and
 # Installation
 Build from source or download NuGet package: https://www.nuget.org/packages/FuzzySearch.Net
 
+Target frameworks .Net 6 and .Net Standard 2.1
 
 # Usage
 
