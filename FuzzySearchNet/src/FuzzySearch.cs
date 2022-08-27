@@ -170,29 +170,31 @@ public class FuzzySearch
         var matches = new List<MatchResult>();
         var candidates = new Stack<CandidateMatch>();
 
-        for (var currentIndex = 0; currentIndex <= text.Length - (subSequence.Length - 1); currentIndex++)
+        for (var currentIndex = 0; currentIndex < text.Length; currentIndex++)
         {
-            candidates.Push(new CandidateMatch(currentIndex, currentIndex, 0, 0, 0, 0, 0));
+            candidates.Push(new CandidateMatch(currentIndex, currentIndex));
 
             // Keep track of the best distance so far, this means we can ignore candidates with higher distance if we already have a match
             var bestFoundDistance = maxDistance;
 
             while (candidates.TryPop(out var candidate))
             {
-                if (candidate.PatternIndex == subSequence.Length && candidate.Distance <= bestFoundDistance)
+                if (candidate.SubSequenceIndex == subSequence.Length)
                 {
-                    matches.Add(new MatchResult
+                    if (candidate.TextIndex <= text.Length)
                     {
-                        StartIndex = candidate.StartIndex,
-                        EndIndex = candidate.TextIndex,
-                        Distance = candidate.Distance,
-                        Match = text[candidate.StartIndex..candidate.TextIndex],
-                        Deletions = candidate.Deletions,
-                        Substitutions = candidate.Substitutions,
-                        Insertions = candidate.Insertions,
-                    });
-
-                    bestFoundDistance = candidate.Distance;
+                        bestFoundDistance = candidate.Distance;
+                        matches.Add(new MatchResult
+                        {
+                            StartIndex = candidate.StartIndex,
+                            EndIndex = candidate.TextIndex,
+                            Distance = candidate.Distance,
+                            Match = text[candidate.StartIndex..candidate.TextIndex],
+                            Deletions = candidate.Deletions,
+                            Substitutions = candidate.Substitutions,
+                            Insertions = candidate.Insertions,
+                        });
+                    }
 
                     // No point searching for better matches if we find a perfect match
                     if (candidate.Distance == 0)
@@ -204,91 +206,54 @@ public class FuzzySearch
                     continue;
                 }
 
-                if (candidate.TextIndex == text.Length)
+                if (candidate.SubSequenceIndex < subSequence.Length && candidate.TextIndex < text.Length && text[candidate.TextIndex] == subSequence[candidate.SubSequenceIndex])
                 {
-                    continue;
-                }
-
-                if (text[candidate.TextIndex] == subSequence[candidate.PatternIndex])
-                {
-                    candidates.Push(new CandidateMatch(candidate.StartIndex, candidate.TextIndex + 1, candidate.PatternIndex + 1, candidate.Distance, candidate.Deletions, candidate.Substitutions, candidate.Insertions));
+                    // match
+                    candidates.Push(candidate with
+                    {
+                        Position = candidate.Position + 1,
+                        TextIndex = candidate.TextIndex + 1,
+                        SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                    });
 
                     if (candidate.Distance < bestFoundDistance)
                     {
+                        // jump over one character in text
                         candidates.Push(candidate with
                         {
-                            PatternIndex = candidate.PatternIndex + 1,
-                            Distance = candidate.Distance + 1,
-                            Deletions = candidate.Deletions + 1,
-                        });
-
-                        candidates.Push(candidate with
-                        {
-                            TextIndex = candidate.TextIndex + 1,
-                            Distance = candidate.Distance + 1,
                             Insertions = candidate.Insertions + 1,
+                            Distance = candidate.Distance + 1,
+                            Position = candidate.Position + 2,
+                            SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                            TextIndex = candidate.TextIndex + 2,
+                            Offset = candidate.Offset - 1,
                         });
                     }
                 }
-                else
+                else if (candidate.Distance < bestFoundDistance)
                 {
-                    if (candidate.Distance < bestFoundDistance)
+                    // substitute one character
+                    candidates.Push(candidate with
                     {
-                        candidates.Push(candidate with
-                        {
-                            TextIndex = candidate.TextIndex + 1,
-                            PatternIndex = candidate.PatternIndex + 1,
-                            Distance = candidate.Distance + 1,
-                            Substitutions = candidate.Substitutions + 1,
-                        });
+                        Substitutions = candidate.Substitutions + 1,
+                        Distance = candidate.Distance + 1,
+                        Position = candidate.Position + 1,
+                        TextIndex = candidate.TextIndex + 1,
+                        SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                    });
 
-                        candidates.Push(candidate with
-                        {
-                            PatternIndex = candidate.PatternIndex + 1,
-                            Distance = candidate.Distance + 1,
-                            Deletions = candidate.Deletions + 1,
-                        });
-
-                        candidates.Push(candidate with
-                        {
-                            TextIndex = candidate.TextIndex + 1,
-                            Distance = candidate.Distance + 1,
-                            Insertions = candidate.Insertions + 1,
-                        });
-                    }
+                    // jump over one character in subsequence
+                    candidates.Push(candidate with
+                    {
+                        Deletions = candidate.Deletions + 1,
+                        Distance = candidate.Distance + 1,
+                        Offset = candidate.Offset + 1,
+                        SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                    });
                 }
             }
         }
 
-        matches = matches.Distinct().ToList();
-
-        if (matches.Count > 1)
-        {
-            var groups = new List<List<MatchResult>>();
-
-            groups.Add(new List<MatchResult>());
-
-            var match = matches[0];
-            groups[0].Add(match);
-
-            for (var i = 0; i < matches.Count - 1; i++)
-            {
-                var currentMatch = matches[i];
-                if ((currentMatch.StartIndex + currentMatch.Insertions) >= (match.EndIndex - match.Insertions))
-                {
-                    groups.Add(new List<MatchResult>());
-                }
-
-                groups.Last().Add(currentMatch);
-
-                match = currentMatch;
-            }
-
-            return groups.Select(o => o.OrderBy(o => o.Distance).ThenByDescending(o => o.Match.Length).First()).ToList();
-        }
-        else
-        {
-            return matches;
-        }
+        return Utils.GetBestMatches(matches.OrderBy(o => o.StartIndex).ToList(), maxDistance);
     }
 }
