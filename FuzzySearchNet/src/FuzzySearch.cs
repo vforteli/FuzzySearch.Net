@@ -3,6 +3,14 @@ namespace FuzzySearchNet;
 public class FuzzySearch
 {
     /// <summary>
+    /// Find instances of sub sequence in text with options
+    /// </summary>
+    /// <param name="subSequence"></param>
+    /// <param name="text"></param>    
+    public static IEnumerable<MatchResult> Find(string subSequence, string text, FuzzySearchOptions options) => Find(subSequence, text, 3, SearchOptions.None);
+
+
+    /// <summary>
     /// Find instances of sub sequence in text up to default maximum distance 3.
     /// </summary>
     /// <param name="subSequence"></param>
