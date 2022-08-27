@@ -22,7 +22,7 @@
     <PackageProjectUrl>https://github.com/vforteli/FuzzySearch.Net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/vforteli/FuzzySearch.Net</RepositoryUrl>
     <PackageLicense>https://github.com/vforteli/FuzzySearch.Net/blob/main/LICENSE.md</PackageLicense>
-    <PackageReleaseNotes>Async methods for searching streams</PackageReleaseNotes>
+    <PackageReleaseNotes>Add support for finding in streams</PackageReleaseNotes>
     <PackageTags>fuzzy search;levenshtein distance;dotnet;.net;c#;fuzzysearch.net</PackageTags>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>

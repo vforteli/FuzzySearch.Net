@@ -8,13 +8,17 @@ public class BenchmarkFuzzySearch
     private const string term2 = "fooo--foo-----fo";
     private const string text = "foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--foo-----fo--foo-f--fooo--";
 
-    [Benchmark]
-    public void SubstitutionOnlyBufferingShort() => FuzzySearch.FindSubstitutionsOnly(term, text, 1);
+    //[Benchmark]
+    //public void SubstitutionOnlyBufferingShort() => FuzzySearch.FindSubstitutionsOnlyBuffering(term, text, 1);
+
+    //[Benchmark]
+    //public void SubstitutionOnlyBufferingLong() => FuzzySearch.FindSubstitutionsOnlyBuffering(term2, text, 1);
+
+
+    //[Benchmark]
+    //public void SubstitutionOnlyBufferingLong3distance() => FuzzySearch.FindSubstitutionsOnlyBuffering(term2, text, 3);
+
 
     [Benchmark]
-    public void SubstitutionOnlyBufferingLong() => FuzzySearch.FindSubstitutionsOnly(term2, text, 1);
-
-
-    [Benchmark]
-    public void SubstitutionOnlyBufferingLong3distance() => FuzzySearch.FindSubstitutionsOnly(term2, text, 3);
+    public void LevenshteinLong() => FuzzySearch.FindLevenshtein(term2, text, 3);
 }
