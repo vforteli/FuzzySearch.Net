@@ -47,11 +47,11 @@ public class FuzzySearch
         }
         else if (searchMode == SearchOptions.SubstitutionsOnly)
         {
-            return FindSubstitutionsOnlyBuffering(subSequence, text, maxDistance);
+            return FindSubstitutionsOnly(subSequence, text, maxDistance);
         }
         else
         {
-            return FindBuffering(subSequence, text, maxDistance);
+            return FindLevenshtein(subSequence, text, maxDistance);
         }
     }
 
@@ -165,7 +165,7 @@ public class FuzzySearch
     /// </summary>
     /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    public static IEnumerable<MatchResult> FindSubstitutionsOnlyBuffering(string subSequence, string text, int maxDistance)
+    public static IEnumerable<MatchResult> FindSubstitutionsOnly(string subSequence, string text, int maxDistance)
     {
         var matches = new List<MatchResult>();
         var termLengthMinusOne = subSequence.Length - 1;
@@ -209,11 +209,79 @@ public class FuzzySearch
 
 
     /// <summary>
+    /// Finds term in text with only substitutions from stream
+    /// </summary>
+    /// <param name="subSequence"></param>    
+    /// <param name="textStream"></param>
+    /// <param name="maxDistance"></param>
+    /// <param name="bufferSize">Default 4096. If bufferSize is less then maxdistance, it will become a multiple of bufferSize</param>
+    public static async Task<IEnumerable<MatchResult>> FindSubstitutionsOnlyAsync(string subSequence, Stream textStream, int maxDistance, int bufferSize = 4096)
+    {
+        var matches = new List<MatchResult>();
+        var termLengthMinusOne = subSequence.Length - 1;
+
+        bufferSize = (((subSequence.Length * 2) / bufferSize) + 1) * bufferSize;
+        var buffer = new char[bufferSize];
+        using var streamReader = new StreamReader(textStream);
+
+        var streamIndexOffset = 0;
+
+        await streamReader.ReadBlockAsync(buffer, 0, termLengthMinusOne);
+
+        while (!streamReader.EndOfStream)
+        {
+            var bytesRead = await streamReader.ReadBlockAsync(buffer, termLengthMinusOne, buffer.Length - termLengthMinusOne);
+
+            for (var currentIndex = 0; currentIndex < buffer.Length - termLengthMinusOne; currentIndex++)
+            {
+                var needlePosition = currentIndex;
+                var candidateDistance = 0;
+
+                for (var termIndex = 0; termIndex < subSequence.Length; termIndex++)
+                {
+                    if (buffer[needlePosition] != subSequence[termIndex])
+                    {
+                        candidateDistance++;
+                        if (candidateDistance > maxDistance)
+                        {
+                            break;
+                        }
+                    }
+
+                    needlePosition++;
+                }
+
+                if (candidateDistance <= maxDistance)
+                {
+                    matches.Add(new MatchResult
+                    {
+                        StartIndex = streamIndexOffset + currentIndex,
+                        EndIndex = streamIndexOffset + currentIndex + subSequence.Length,
+                        Distance = candidateDistance,
+                        Match = new string(buffer[currentIndex..(currentIndex + subSequence.Length)]),
+                        Deletions = 0,
+                        Substitutions = candidateDistance,
+                        Insertions = 0,
+                    });
+                }
+            }
+
+            streamIndexOffset += bytesRead;
+
+            // We have to overlap with the next buffer to ensure matches spanning multiple "chunks" can be read
+            Array.Copy(buffer, bytesRead, buffer, 0, termLengthMinusOne);
+        }
+
+        return matches;
+    }
+
+
+    /// <summary>
     /// Finds term in text with max distance
     /// </summary>
     /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    public static IEnumerable<MatchResult> FindBuffering(string subSequence, string text, int maxDistance)
+    public static IEnumerable<MatchResult> FindLevenshtein(string subSequence, string text, int maxDistance)
     {
         var matches = new List<MatchResult>();
         var candidates = new Stack<CandidateMatch>();

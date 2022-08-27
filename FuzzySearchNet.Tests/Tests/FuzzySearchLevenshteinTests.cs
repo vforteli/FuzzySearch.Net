@@ -288,7 +288,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("pattern", "----------------------pattttern", 22, "pattttern", 2)]
     public void TestLevenshteinBufferBoundary(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = FuzzySearch.FindBuffering(term, text, 3).ToList();
+        var results = FuzzySearch.FindLevenshtein(term, text, 3).ToList();
 
         Assert.Multiple(() =>
         {
@@ -315,7 +315,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("ab", "axb", 0, "axb", 1)]
     public void TestLevenshteinBufferBoundaryShort(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = FuzzySearch.FindBuffering(term, text, 1).ToList();
+        var results = FuzzySearch.FindLevenshtein(term, text, 1).ToList();
 
         Assert.Multiple(() =>
         {
@@ -330,7 +330,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("abc", "c", 0, "c", 2)]
     public void TestLevenshteinBufferBoundaryShort2Distance(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = FuzzySearch.FindBuffering(term, text, 2).ToList();
+        var results = FuzzySearch.FindLevenshtein(term, text, 2).ToList();
 
         Assert.Multiple(() =>
         {
@@ -348,7 +348,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("abcd", "xc", 0, "xc", 3)]
     public void TestLevenshteinBufferBoundaryShort3Distance(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = FuzzySearch.FindBuffering(term, text, 3).ToList();
+        var results = FuzzySearch.FindLevenshtein(term, text, 3).ToList();
 
         Assert.Multiple(() =>
         {
