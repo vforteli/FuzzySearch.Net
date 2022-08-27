@@ -1,6 +1,6 @@
 ﻿namespace FuzzySearchNet;
 
-public class MatchResult
+public record MatchResult
 {
     public int StartIndex { get; set; }
     public int EndIndex { get; set; }
