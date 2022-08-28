@@ -63,7 +63,7 @@ public class FuzzySearch
     /// <param name="text"></param>    
     public static IEnumerable<MatchResult> FindExact(string subSequence, string text)
     {
-        // ok so this whole method is a bit redundant... but the idea is to have this using a stream instead of text... later
+        // indexof would probably run circles around this...
         var needlePosition = 0;
         var termLength = subSequence.Length - 1;
         var currentIndex = 0;
@@ -167,7 +167,6 @@ public class FuzzySearch
     /// <param name="text"></param>    
     public static IEnumerable<MatchResult> FindSubstitutionsOnly(string subSequence, string text, int maxDistance)
     {
-        var matches = new List<MatchResult>();
         var termLengthMinusOne = subSequence.Length - 1;
 
         for (var currentIndex = 0; currentIndex < text.Length - termLengthMinusOne; currentIndex++)
@@ -191,7 +190,7 @@ public class FuzzySearch
 
             if (candidateDistance <= maxDistance)
             {
-                matches.Add(new MatchResult
+                yield return new MatchResult
                 {
                     StartIndex = currentIndex,
                     EndIndex = currentIndex + subSequence.Length,
@@ -200,11 +199,9 @@ public class FuzzySearch
                     Deletions = 0,
                     Substitutions = candidateDistance,
                     Insertions = 0,
-                });
+                };
             }
         }
-
-        return matches;
     }
 
 
@@ -277,13 +274,21 @@ public class FuzzySearch
 
 
     /// <summary>
-    /// Finds term in text with max distance
+    /// Finds sub sequence in text with max levenshtein distance
     /// </summary>
     /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    public static IEnumerable<MatchResult> FindLevenshtein(string subSequence, string text, int maxDistance)
+    public static IEnumerable<MatchResult> FindLevenshtein(string subSequence, string text, int maxDistance) => Utils.GetBestMatches(FindLevenshteinAll(subSequence, text, maxDistance), maxDistance);
+
+
+    /// <summary>
+    /// Finds sub sequence in text with max levenshtein distance
+    /// This method finds all matches and does not try to consolidate overlapping matches
+    /// </summary>
+    /// <param name="subSequence"></param>
+    /// <param name="text"></param>    
+    internal static IEnumerable<MatchResult> FindLevenshteinAll(string subSequence, string text, int maxDistance)
     {
-        var matches = new List<MatchResult>();
         var candidates = new Stack<CandidateMatch>();
 
         for (var currentIndex = 0; currentIndex < text.Length; currentIndex++)
@@ -300,7 +305,7 @@ public class FuzzySearch
                     if (candidate.TextIndex <= text.Length)
                     {
                         bestFoundDistance = candidate.Distance;
-                        matches.Add(new MatchResult
+                        yield return new MatchResult
                         {
                             StartIndex = candidate.StartIndex,
                             EndIndex = candidate.TextIndex,
@@ -309,7 +314,7 @@ public class FuzzySearch
                             Deletions = candidate.Deletions,
                             Substitutions = candidate.Substitutions,
                             Insertions = candidate.Insertions,
-                        });
+                        };
                     }
 
                     // No point searching for better matches if we find a perfect match
@@ -369,7 +374,5 @@ public class FuzzySearch
                 }
             }
         }
-
-        return Utils.GetBestMatches(matches.OrderBy(o => o.StartIndex).ToList(), maxDistance);
     }
 }
