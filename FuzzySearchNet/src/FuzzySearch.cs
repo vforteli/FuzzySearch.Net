@@ -375,4 +375,141 @@ public class FuzzySearch
             }
         }
     }
+
+
+    /// <summary>
+    /// Finds sub sequence in text with max levenshtein distance
+    /// This method finds all matches and does not try to consolidate overlapping matches
+    /// </summary>
+    /// <param name="subSequence"></param>
+    /// <param name="text"></param>    
+    public static async Task<IEnumerable<MatchResult>> FindLevenshteinAllAsync(string subSequence, Stream textStream, int maxDistance, int bufferSize = 4096)
+    {
+        var matches = new List<MatchResult>();
+
+        if (subSequence.Length == 0)
+        {
+            return matches;
+        }
+
+        var candidates = new Stack<CandidateMatch>();
+
+        var startBuffer = subSequence.Length + maxDistance;
+        bufferSize = (((startBuffer * 2) / bufferSize) + 1) * bufferSize;
+        var buffer = new char[bufferSize];
+        using var streamReader = new StreamReader(textStream);
+
+        var streamIndexOffset = 0;
+        var totalBytesRead = 0;
+
+        while (!streamReader.EndOfStream)
+        {
+            var bytesRead = await streamReader.ReadBlockAsync(buffer, 0, buffer.Length);
+
+            totalBytesRead += bytesRead;
+
+
+            for (var currentIndex = 0; currentIndex < bytesRead; currentIndex++)
+            {
+                candidates.Push(new CandidateMatch(currentIndex, currentIndex));
+
+                // Keep track of the best distance so far, this means we can ignore candidates with higher distance if we already have a match
+                var bestFoundDistance = maxDistance;
+
+                while (candidates.TryPop(out var candidate))
+                {
+                    if (candidate.SubSequenceIndex == subSequence.Length)
+                    {
+                        if (candidate.TextIndex <= bytesRead)
+                        {
+                            bestFoundDistance = candidate.Distance;
+                            matches.Add(new MatchResult
+                            {
+                                StartIndex = streamIndexOffset + candidate.StartIndex,
+                                EndIndex = streamIndexOffset + candidate.TextIndex,
+                                Distance = candidate.Distance,
+                                Match = new string(buffer[candidate.StartIndex..candidate.TextIndex]),
+                                Deletions = candidate.Deletions,
+                                Substitutions = candidate.Substitutions,
+                                Insertions = candidate.Insertions,
+                            });
+                        }
+
+                        // No point searching for better matches if we find a perfect match
+                        if (candidate.Distance == 0)
+                        {
+                            candidates.Clear();
+                            break;
+                        }
+
+                        continue;
+                    }
+
+                    if (candidate.SubSequenceIndex < subSequence.Length && candidate.TextIndex < bytesRead && buffer[candidate.TextIndex] == subSequence[candidate.SubSequenceIndex])
+                    {
+                        // match
+                        candidates.Push(candidate with
+                        {
+                            Position = candidate.Position + 1,
+                            TextIndex = candidate.TextIndex + 1,
+                            SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                        });
+
+                        if (candidate.Distance < bestFoundDistance)
+                        {
+                            // jump over one character in text
+                            candidates.Push(candidate with
+                            {
+                                Insertions = candidate.Insertions + 1,
+                                Distance = candidate.Distance + 1,
+                                Position = candidate.Position + 2,
+                                SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                                TextIndex = candidate.TextIndex + 2,
+                                Offset = candidate.Offset - 1,
+                            });
+                        }
+                    }
+                    else if (candidate.Distance < bestFoundDistance)
+                    {
+                        // substitute one character
+                        candidates.Push(candidate with
+                        {
+                            Substitutions = candidate.Substitutions + 1,
+                            Distance = candidate.Distance + 1,
+                            Position = candidate.Position + 1,
+                            TextIndex = candidate.TextIndex + 1,
+                            SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                        });
+
+                        // jump over one character in subsequence
+                        candidates.Push(candidate with
+                        {
+                            Deletions = candidate.Deletions + 1,
+                            Distance = candidate.Distance + 1,
+                            Offset = candidate.Offset + 1,
+                            SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                        });
+                    }
+                }
+            }
+
+
+            // We have to overlap with the next buffer to ensure matches spanning multiple "chunks" can be read
+            if (!streamReader.EndOfStream)
+            {
+                if (streamIndexOffset == 0)
+                {
+                    Array.Copy(buffer, bytesRead - startBuffer, buffer, 0, startBuffer);
+                }
+                else
+                {
+                    Array.Copy(buffer, bytesRead, buffer, 0, startBuffer);
+                }
+
+                streamIndexOffset += bytesRead;
+            }
+        }
+
+        return Utils.GetBestMatches(matches, maxDistance);
+    }
 }
