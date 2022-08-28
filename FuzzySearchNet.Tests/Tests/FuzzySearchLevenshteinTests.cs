@@ -356,4 +356,28 @@ public class FuzzySearchLevenshteinTests
             TestUtils.AssertMatch(results[0], expectedStartIndex, expectedMatch, expectedDistance);
         });
     }
+
+
+    [Test]
+    public void TestLevenshteinLinq()
+    {
+        var text = "---abcc----abc---axc--";
+        var term = "abc";
+
+        var results = FuzzySearch.FindLevenshtein(term, text, 2).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(3));
+            TestUtils.AssertMatch(results[0], 3, "abc", 0);
+            TestUtils.AssertMatch(results[1], 11, "abc", 0);
+            TestUtils.AssertMatch(results[2], 17, "axc", 1);
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(FuzzySearch.FindLevenshtein(term, text, 3).Any());
+            TestUtils.AssertMatch(FuzzySearch.FindLevenshtein(term, text, 3).First(), 3, "abc", 0);
+        });
+    }
 }
