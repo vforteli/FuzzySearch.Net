@@ -25,6 +25,16 @@ Searching for strings in strings
   // Search using only substitutions and default maximum distance (3)
   var results = FuzzySearch.Find("sometext", "here is someteext for you", SearchOptions.SubstitutionsOnly);  
   
+  // Search using with more specific options, for example allowing more substitutions than insertions and deletions
+  var results = FuzzySearch.Find(word, text, new FuzzySearchOptions(3, 1, 1));
+  
+  // Check for any matches using Linq. Using Any or First is more efficient than count since enumeration will stop after first match.
+  // This will not necessarily yield the best match though.
+  if(FuzzySearch.Find(word, text, 2).Any()) {
+    // do stuff
+  }
+  
+    
   // Find returns a list of MatchResults with information about matches
   public class MatchResult
   {
