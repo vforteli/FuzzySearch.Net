@@ -61,4 +61,19 @@ public class FuzzySearchStreamSubstitutionsOnlyTests
             TestUtils.AssertMatch(results[0], 24, 24 + term.Length, text);
         });
     }
+
+    [Test]
+    public async Task TestSubstitutionOnlyBiggerBufferLongerSubsequence()
+    {
+        var text = "thisislongerthanthebufferandshouldntexplo";
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        var term = "thisislongerthanthebufferandshouldntexplode";
+
+        var results = (await FuzzySearch.FindSubstitutionsOnlyAsync(term, stream, 3)).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(0));
+        });
+    }
 }

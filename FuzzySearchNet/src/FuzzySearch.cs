@@ -242,28 +242,32 @@ public class FuzzySearch
     public static async Task<IEnumerable<MatchResult>> FindSubstitutionsOnlyAsync(string subSequence, Stream textStream, int maxDistance, int bufferSize = 4096)
     {
         var matches = new List<MatchResult>();
-        var termLengthMinusOne = subSequence.Length - 1;
+        var subSequenceLengthMinusOne = subSequence.Length - 1;
 
-        bufferSize = (((subSequence.Length * 2) / bufferSize) + 1) * bufferSize;
+        bufferSize = ((subSequence.Length * 2 / bufferSize) + 1) * bufferSize;
         var buffer = new char[bufferSize];
         using var streamReader = new StreamReader(textStream);
 
         var streamIndexOffset = 0;
 
-        await streamReader.ReadBlockAsync(buffer, 0, termLengthMinusOne);
+        var bytesRead = await streamReader.ReadBlockAsync(buffer, 0, buffer.Length);
 
-        while (!streamReader.EndOfStream)
+        do
         {
-            var bytesRead = await streamReader.ReadBlockAsync(buffer, termLengthMinusOne, buffer.Length - termLengthMinusOne);
+            if (bytesRead < subSequence.Length)
+            {
+                // Cant have a match if subsequence is longer than text
+                break;
+            }
 
-            for (var currentIndex = 0; currentIndex < buffer.Length - termLengthMinusOne; currentIndex++)
+            for (var currentIndex = 0; currentIndex < bytesRead - subSequenceLengthMinusOne; currentIndex++)
             {
                 var needlePosition = currentIndex;
                 var candidateDistance = 0;
 
-                for (var termIndex = 0; termIndex < subSequence.Length; termIndex++)
+                for (var subSequenceIndex = 0; subSequenceIndex < subSequence.Length; subSequenceIndex++)
                 {
-                    if (buffer[needlePosition] != subSequence[termIndex])
+                    if (buffer[needlePosition] != subSequence[subSequenceIndex])
                     {
                         candidateDistance++;
                         if (candidateDistance > maxDistance)
@@ -290,11 +294,13 @@ public class FuzzySearch
                 }
             }
 
-            streamIndexOffset += bytesRead;
+            streamIndexOffset += bytesRead - subSequenceLengthMinusOne;
 
-            // We have to overlap with the next buffer to ensure matches spanning multiple "chunks" can be read
-            Array.Copy(buffer, bytesRead, buffer, 0, termLengthMinusOne);
+            Array.Copy(buffer, buffer.Length - subSequenceLengthMinusOne, buffer, 0, subSequenceLengthMinusOne);
+            bytesRead = await streamReader.ReadBlockAsync(buffer, subSequenceLengthMinusOne, buffer.Length - subSequenceLengthMinusOne);
+            bytesRead += subSequenceLengthMinusOne;
         }
+        while (bytesRead > subSequenceLengthMinusOne);
 
         return matches;
     }
@@ -426,20 +432,16 @@ public class FuzzySearch
         var candidates = new Stack<CandidateMatch>();
 
         var startBuffer = subSequence.Length + maxDistance;
-        bufferSize = (((startBuffer * 2) / bufferSize) + 1) * bufferSize;
+        bufferSize = ((startBuffer * 2 / bufferSize) + 1) * bufferSize;
         var buffer = new char[bufferSize];
         using var streamReader = new StreamReader(textStream);
 
         var streamIndexOffset = 0;
-        var totalBytesRead = 0;
 
-        while (!streamReader.EndOfStream)
+        var bytesRead = await streamReader.ReadBlockAsync(buffer, 0, buffer.Length);
+
+        do
         {
-            var bytesRead = await streamReader.ReadBlockAsync(buffer, 0, buffer.Length);
-
-            totalBytesRead += bytesRead;
-
-
             for (var currentIndex = 0; currentIndex < bytesRead; currentIndex++)
             {
                 candidates.Push(new CandidateMatch(currentIndex, currentIndex));
@@ -522,22 +524,14 @@ public class FuzzySearch
                 }
             }
 
+            streamIndexOffset += bytesRead - startBuffer;
 
-            // We have to overlap with the next buffer to ensure matches spanning multiple "chunks" can be read
-            if (!streamReader.EndOfStream)
-            {
-                if (streamIndexOffset == 0)
-                {
-                    Array.Copy(buffer, bytesRead - startBuffer, buffer, 0, startBuffer);
-                }
-                else
-                {
-                    Array.Copy(buffer, bytesRead, buffer, 0, startBuffer);
-                }
+            Array.Copy(buffer, buffer.Length - startBuffer, buffer, 0, startBuffer);
+            bytesRead = await streamReader.ReadBlockAsync(buffer, startBuffer, buffer.Length - startBuffer);
+            bytesRead += startBuffer;
 
-                streamIndexOffset += bytesRead;
-            }
         }
+        while (bytesRead > startBuffer);
 
         return Utils.GetBestMatches(matches, maxDistance);
     }

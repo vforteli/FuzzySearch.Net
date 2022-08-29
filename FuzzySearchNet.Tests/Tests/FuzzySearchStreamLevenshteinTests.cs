@@ -376,8 +376,8 @@ public class FuzzySearchStreamLevenshteinTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(FuzzySearch.FindLevenshtein(term, text, 3).Any());
-            TestUtils.AssertMatch(FuzzySearch.FindLevenshtein(term, text, 3).First(), 3, "abc", 0);
+            Assert.That(FuzzySearch.FindLevenshtein(term, text, new FuzzySearchOptions(3)).Any());
+            TestUtils.AssertMatch(FuzzySearch.FindLevenshtein(term, text, new FuzzySearchOptions(3)).First(), 3, "abc", 0);
         });
     }
 }
