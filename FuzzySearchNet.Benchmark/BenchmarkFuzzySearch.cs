@@ -22,6 +22,6 @@ public class BenchmarkFuzzySearch
     [Benchmark]
     public void LevenshteinLong()
     {
-        _ = FuzzySearch.FindLevenshtein(term2, text, 3).ToList();
+        _ = FuzzySearch.FindLevenshtein(term2, text, new FuzzySearchOptions(3)).ToList();
     }
 }

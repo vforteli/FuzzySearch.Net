@@ -9,7 +9,6 @@ public record struct CandidateMatch(int StartIndex, int TextIndex, int SubSequen
 //    public int TextIndex => StartIndex + Position;
 //    public int SubSequenceIndex => Position + Offset;
 //    public int Position = 0;
-//    public int Offset = 0;
 //    public int Deletions = 0;
 //    public int Substitutions = 0;
 //    public int Insertions = 0;
