@@ -7,7 +7,26 @@ public class FuzzySearch
     /// </summary>
     /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    public static IEnumerable<MatchResult> Find(string subSequence, string text, FuzzySearchOptions options) => Find(subSequence, text, 3, SearchOptions.None);
+    public static IEnumerable<MatchResult> Find(string subSequence, string text, FuzzySearchOptions options)
+    {
+        if (string.IsNullOrEmpty(subSequence))
+        {
+            return new List<MatchResult>();
+        }
+
+        if (options.MaxTotalDistance == 0)
+        {
+            return FindExact(subSequence, text);
+        }
+        else if (options.MaxDeletions == 0 && options.MaxInsertions == 0)
+        {
+            return FindSubstitutionsOnly(subSequence, text, options.MaxTotalDistance);
+        }
+        else
+        {
+            return FindLevenshtein(subSequence, text, options);
+        }
+    }
 
 
     /// <summary>
@@ -59,7 +78,7 @@ public class FuzzySearch
         }
         else
         {
-            return FindLevenshtein(subSequence, text, maxDistance);
+            return FindLevenshtein(subSequence, text, new FuzzySearchOptions(maxDistance));
         }
     }
 
@@ -286,7 +305,7 @@ public class FuzzySearch
     /// </summary>
     /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    public static IEnumerable<MatchResult> FindLevenshtein(string subSequence, string text, int maxDistance) => Utils.GetBestMatches(FindLevenshteinAll(subSequence, text, maxDistance), maxDistance);
+    public static IEnumerable<MatchResult> FindLevenshtein(string subSequence, string text, FuzzySearchOptions options) => Utils.GetBestMatches(FindLevenshteinAll(subSequence, text, options), options.MaxTotalDistance);
 
 
     /// <summary>
@@ -295,7 +314,7 @@ public class FuzzySearch
     /// </summary>
     /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    internal static IEnumerable<MatchResult> FindLevenshteinAll(string subSequence, string text, int maxDistance)
+    internal static IEnumerable<MatchResult> FindLevenshteinAll(string subSequence, string text, FuzzySearchOptions options)
     {
         var candidates = new Stack<CandidateMatch>();
 
@@ -304,7 +323,7 @@ public class FuzzySearch
             candidates.Push(new CandidateMatch(currentIndex, currentIndex));
 
             // Keep track of the best distance so far, this means we can ignore candidates with higher distance if we already have a match
-            var bestFoundDistance = maxDistance;
+            var bestFoundDistance = options.MaxTotalDistance;
 
             while (candidates.TryPop(out var candidate))
             {
@@ -337,7 +356,7 @@ public class FuzzySearch
 
                 if (candidate.SubSequenceIndex < subSequence.Length && candidate.TextIndex < text.Length && text[candidate.TextIndex] == subSequence[candidate.SubSequenceIndex])
                 {
-                    // match
+                    // match                   
                     candidates.Push(candidate with
                     {
                         Position = candidate.Position + 1,
@@ -345,7 +364,7 @@ public class FuzzySearch
                         SubSequenceIndex = candidate.SubSequenceIndex + 1,
                     });
 
-                    if (candidate.Distance < bestFoundDistance)
+                    if (candidate.Distance < bestFoundDistance && options.CanInsert(candidate.Distance, candidate.Insertions))
                     {
                         // jump over one character in text
                         candidates.Push(candidate with
@@ -360,23 +379,29 @@ public class FuzzySearch
                 }
                 else if (candidate.Distance < bestFoundDistance)
                 {
-                    // substitute one character
-                    candidates.Push(candidate with
+                    if (options.CanSubstitute(candidate.Distance, candidate.Substitutions))
                     {
-                        Substitutions = candidate.Substitutions + 1,
-                        Distance = candidate.Distance + 1,
-                        Position = candidate.Position + 1,
-                        TextIndex = candidate.TextIndex + 1,
-                        SubSequenceIndex = candidate.SubSequenceIndex + 1,
-                    });
+                        // substitute one character
+                        candidates.Push(candidate with
+                        {
+                            Substitutions = candidate.Substitutions + 1,
+                            Distance = candidate.Distance + 1,
+                            Position = candidate.Position + 1,
+                            TextIndex = candidate.TextIndex + 1,
+                            SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                        });
+                    }
 
-                    // jump over one character in subsequence
-                    candidates.Push(candidate with
+                    if (options.CanDelete(candidate.Distance, candidate.Deletions))
                     {
-                        Deletions = candidate.Deletions + 1,
-                        Distance = candidate.Distance + 1,
-                        SubSequenceIndex = candidate.SubSequenceIndex + 1,
-                    });
+                        // jump over one character in subsequence
+                        candidates.Push(candidate with
+                        {
+                            Deletions = candidate.Deletions + 1,
+                            Distance = candidate.Distance + 1,
+                            SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                        });
+                    }
                 }
             }
         }

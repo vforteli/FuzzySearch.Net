@@ -34,7 +34,7 @@ public class FuzzySearchOptionsTests
         Assert.Multiple(() =>
         {
             Assert.That(options.CanSubstitute(100, 1), Is.False);
-            Assert.That(options.CanSubstitute(100, 0));
+            Assert.That(options.CanSubstitute(0, 0));
         });
     }
 
@@ -70,7 +70,7 @@ public class FuzzySearchOptionsTests
         Assert.Multiple(() =>
         {
             Assert.That(options.CanDelete(100, 1), Is.False);
-            Assert.That(options.CanDelete(100, 0));
+            Assert.That(options.CanDelete(0, 0));
         });
     }
 
@@ -106,7 +106,7 @@ public class FuzzySearchOptionsTests
         Assert.Multiple(() =>
         {
             Assert.That(options.CanInsert(100, 1), Is.False);
-            Assert.That(options.CanInsert(100, 0));
+            Assert.That(options.CanInsert(0, 0));
         });
     }
 }

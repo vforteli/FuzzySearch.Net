@@ -161,6 +161,97 @@ public class FuzzySearchLevenshteinTests
 
 
     [Test]
+    public void TestOptionsMaxSubstitutions()
+    {
+        var word = "pattern";
+        var text = "--patteron--";
+
+        var results = FuzzySearch.FindLevenshtein(word, text, new FuzzySearchOptions(1, 0, 0)).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(1));
+            TestUtils.AssertMatch(results[0], 2, "pattero", 1);
+        });
+    }
+
+    // The substitution can also be made by deleting one character and inserting one, therefore if we dont limit them, and the max distance is 2 or more, the text will still be matched
+    [Test]
+    public void TestOptionsMaxSubstitutions0()
+    {
+        var word = "patternsandpractices";
+        var text = "--patternsaxdpractices--";
+
+        var results = FuzzySearch.FindLevenshtein(word, text, new FuzzySearchOptions(1, maxSubstitutions: 0)).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(0));
+        });
+    }
+
+
+    [Test]
+    public void TestOptionsMaxInsertions()
+    {
+        var word = "pattern";
+        var text = "--patteron--";
+
+        var results = FuzzySearch.FindLevenshtein(word, text, new FuzzySearchOptions(0, 0, 1)).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(1));
+            TestUtils.AssertMatch(results[0], 2, "patteron", 1);
+        });
+    }
+
+    [Test]
+    public void TestOptionsMaxInsertions0()
+    {
+        var word = "patternsandpractices";
+        var text = "--patternsaxndpractices--";
+
+        var results = FuzzySearch.FindLevenshtein(word, text, new FuzzySearchOptions(3, maxInsertions: 0)).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(0));
+        });
+    }
+
+
+    [Test]
+    public void TestOptionsMaxDeletions()
+    {
+        var word = "pattern";
+        var text = "--patteron--";
+
+        var results = FuzzySearch.FindLevenshtein(word, text, new FuzzySearchOptions(0, 1, 0)).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(1));
+            TestUtils.AssertMatch(results[0], 2, "patter", 1);
+        });
+    }
+
+    [Test]
+    public void TestOptionsMaxDeletions0()
+    {
+        var word = "patternsandpractices";
+        var text = "--patternandpractices--";
+
+        var results = FuzzySearch.FindLevenshtein(word, text, new FuzzySearchOptions(3, maxDeletions: 0)).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(0));
+        });
+    }
+
+
+    [Test]
     public void TestMultipleMatchesConsecutiveSubstitutions()
     {
         var word = "pattern";
@@ -288,7 +379,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("pattern", "----------------------pattttern", 22, "pattttern", 2)]
     public void TestLevenshteinBufferBoundary(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = FuzzySearch.FindLevenshtein(term, text, 3).ToList();
+        var results = FuzzySearch.FindLevenshtein(term, text, new FuzzySearchOptions(3)).ToList();
 
         Assert.Multiple(() =>
         {
@@ -315,7 +406,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("ab", "axb", 0, "axb", 1)]
     public void TestLevenshteinBufferBoundaryShort(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = FuzzySearch.FindLevenshtein(term, text, 1).ToList();
+        var results = FuzzySearch.FindLevenshtein(term, text, new FuzzySearchOptions(1)).ToList();
 
         Assert.Multiple(() =>
         {
@@ -330,7 +421,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("abc", "c", 0, "c", 2)]
     public void TestLevenshteinBufferBoundaryShort2Distance(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = FuzzySearch.FindLevenshtein(term, text, 2).ToList();
+        var results = FuzzySearch.FindLevenshtein(term, text, new FuzzySearchOptions(2)).ToList();
 
         Assert.Multiple(() =>
         {
@@ -348,7 +439,7 @@ public class FuzzySearchLevenshteinTests
     [TestCase("abcd", "xc", 0, "xc", 3)]
     public void TestLevenshteinBufferBoundaryShort3Distance(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = FuzzySearch.FindLevenshtein(term, text, 3).ToList();
+        var results = FuzzySearch.FindLevenshtein(term, text, new FuzzySearchOptions(3)).ToList();
 
         Assert.Multiple(() =>
         {
@@ -364,7 +455,7 @@ public class FuzzySearchLevenshteinTests
         var text = "---abcc----abc---axc--";
         var term = "abc";
 
-        var results = FuzzySearch.FindLevenshtein(term, text, 2).ToList();
+        var results = FuzzySearch.FindLevenshtein(term, text, new FuzzySearchOptions(2)).ToList();
 
         Assert.Multiple(() =>
         {
@@ -376,8 +467,8 @@ public class FuzzySearchLevenshteinTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(FuzzySearch.FindLevenshtein(term, text, 3).Any());
-            TestUtils.AssertMatch(FuzzySearch.FindLevenshtein(term, text, 3).First(), 3, "abc", 0);
+            Assert.That(FuzzySearch.FindLevenshtein(term, text, new FuzzySearchOptions(3)).Any());
+            TestUtils.AssertMatch(FuzzySearch.FindLevenshtein(term, text, new FuzzySearchOptions(3)).First(), 3, "abc", 0);
         });
     }
 }
