@@ -355,7 +355,6 @@ public class FuzzySearch
                             Position = candidate.Position + 2,
                             SubSequenceIndex = candidate.SubSequenceIndex + 1,
                             TextIndex = candidate.TextIndex + 2,
-                            Offset = candidate.Offset - 1,
                         });
                     }
                 }
@@ -376,7 +375,6 @@ public class FuzzySearch
                     {
                         Deletions = candidate.Deletions + 1,
                         Distance = candidate.Distance + 1,
-                        Offset = candidate.Offset + 1,
                         SubSequenceIndex = candidate.SubSequenceIndex + 1,
                     });
                 }
