@@ -8,7 +8,7 @@ public class FuzzySearchStreamExactMatchTests
         var word = "foo";
         var text = new MemoryStream(Encoding.UTF8.GetBytes("foo-----fo--foo-f--fooo--"));
 
-        var results = (await FuzzySearch.FindExactAsync(word, text)).ToList();
+        var results = await FuzzySearch.FindExactAsync(word, text).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -36,7 +36,7 @@ public class FuzzySearchStreamExactMatchTests
     public async Task TestZeroMaxDistanceBufferBoundary(string term, string text, int expectedStartIndex)
     {
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
-        var results = (await FuzzySearch.FindExactAsync(term, stream, 8)).ToList();
+        var results = await FuzzySearch.FindExactAsync(term, stream, 8).ToListAsync();
 
         Assert.Multiple(() =>
         {

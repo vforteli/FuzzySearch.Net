@@ -30,6 +30,28 @@ public class FuzzySearch
 
 
     /// <summary>
+    /// Find instances of sub sequence in text with options
+    /// </summary>
+    /// <param name="subSequence"></param>
+    /// <param name="text"></param>    
+    public static IAsyncEnumerable<MatchResult> FindAsync(string subSequence, Stream textStream, FuzzySearchOptions options)
+    {
+        if (options.MaxTotalDistance == 0)
+        {
+            return FindExactAsync(subSequence, textStream);
+        }
+        else if (options.MaxDeletions == 0 && options.MaxInsertions == 0)
+        {
+            return FindSubstitutionsOnlyAsync(subSequence, textStream, options.MaxTotalDistance);
+        }
+        else
+        {
+            return FindLevenshteinAsync(subSequence, textStream, options);
+        }
+    }
+
+
+    /// <summary>
     /// Find instances of sub sequence in text up to default maximum distance 3.
     /// </summary>
     /// <param name="subSequence"></param>
@@ -134,9 +156,12 @@ public class FuzzySearch
     /// </summary>
     /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    public static async Task<IEnumerable<MatchResult>> FindExactAsync(string subSequence, Stream textStream, int bufferSize = 4096)
+    public static async IAsyncEnumerable<MatchResult> FindExactAsync(string subSequence, Stream textStream, int bufferSize = 4096)
     {
-        var matches = new List<MatchResult>();
+        if (string.IsNullOrEmpty(subSequence))
+        {
+            yield break;
+        }
 
         var needlePosition = 0;
         var termLength = subSequence.Length - 1;
@@ -156,7 +181,7 @@ public class FuzzySearch
                 {
                     if (needlePosition == termLength)
                     {
-                        matches.Add(new MatchResult
+                        yield return new MatchResult
                         {
                             StartIndex = streamIndexOffset + currentIndex - termLength,
                             EndIndex = streamIndexOffset + currentIndex + 1,
@@ -165,7 +190,7 @@ public class FuzzySearch
                             Deletions = 0,
                             Substitutions = 0,
                             Insertions = 0,
-                        });
+                        };
 
                         needlePosition = 0;
                     }
@@ -185,8 +210,6 @@ public class FuzzySearch
             bytesRead = await streamReader.ReadBlockAsync(buffer, 0, buffer.Length);
         }
         while (bytesRead > 0);
-
-        return matches;
     }
 
 
@@ -242,9 +265,13 @@ public class FuzzySearch
     /// <param name="textStream"></param>
     /// <param name="maxDistance"></param>
     /// <param name="bufferSize">Default 4096. If bufferSize is less then maxdistance, it will become a multiple of bufferSize</param>
-    public static async Task<IEnumerable<MatchResult>> FindSubstitutionsOnlyAsync(string subSequence, Stream textStream, int maxDistance, int bufferSize = 4096)
+    public static async IAsyncEnumerable<MatchResult> FindSubstitutionsOnlyAsync(string subSequence, Stream textStream, int maxDistance, int bufferSize = 4096)
     {
-        var matches = new List<MatchResult>();
+        if (string.IsNullOrEmpty(subSequence))
+        {
+            yield break;
+        }
+
         var subSequenceLengthMinusOne = subSequence.Length - 1;
 
         bufferSize = ((subSequence.Length * 2 / bufferSize) + 1) * bufferSize;
@@ -260,7 +287,7 @@ public class FuzzySearch
             if (bytesRead < subSequence.Length)
             {
                 // Cant have a match if subsequence is longer than text
-                break;
+                yield break;
             }
 
             for (var currentIndex = 0; currentIndex < bytesRead - subSequenceLengthMinusOne; currentIndex++)
@@ -284,7 +311,7 @@ public class FuzzySearch
 
                 if (candidateDistance <= maxDistance)
                 {
-                    matches.Add(new MatchResult
+                    yield return new MatchResult
                     {
                         StartIndex = streamIndexOffset + currentIndex,
                         EndIndex = streamIndexOffset + currentIndex + subSequence.Length,
@@ -293,7 +320,7 @@ public class FuzzySearch
                         Deletions = 0,
                         Substitutions = candidateDistance,
                         Insertions = 0,
-                    });
+                    };
                 }
             }
 
@@ -304,8 +331,6 @@ public class FuzzySearch
             bytesRead += subSequenceLengthMinusOne;
         }
         while (bytesRead > subSequenceLengthMinusOne);
-
-        return matches;
     }
 
 
