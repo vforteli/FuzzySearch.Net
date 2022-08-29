@@ -146,10 +146,10 @@ public class FuzzySearch
 
         var streamIndexOffset = 0;
 
-        while (!streamReader.EndOfStream)
-        {
-            var bytesRead = await streamReader.ReadBlockAsync(buffer, 0, buffer.Length);
+        var bytesRead = await streamReader.ReadBlockAsync(buffer, 0, buffer.Length);
 
+        do
+        {
             for (var currentIndex = 0; currentIndex < bytesRead; currentIndex++)
             {
                 if (buffer[currentIndex] == subSequence[needlePosition])
@@ -181,7 +181,10 @@ public class FuzzySearch
             }
 
             streamIndexOffset += bytesRead;
+
+            bytesRead = await streamReader.ReadBlockAsync(buffer, 0, buffer.Length);
         }
+        while (bytesRead > 0);
 
         return matches;
     }
