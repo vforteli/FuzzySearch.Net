@@ -18,7 +18,7 @@ public class FuzzySearchStreamLevenshteinTests
     [TestCase("1234567", "-----23567", 2, 4, "-23567", 2)]
     public async Task TestSingleMatchWithDeletions(string pattern, string text, int maxDistance, int expectedStart, string expectedMatch, int expectedDistance)
     {
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), maxDistance)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(maxDistance)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -39,7 +39,7 @@ public class FuzzySearchStreamLevenshteinTests
     [TestCase("PATTERN", "----------PATTERNN---------", 2, 10, "PATTERN", 0)]
     public async Task TestSingleMatchWithInsertion(string pattern, string text, int maxDistance, int expectedStart, string expectedMatch, int expectedDistance)
     {
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), maxDistance)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(maxDistance)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -55,7 +55,7 @@ public class FuzzySearchStreamLevenshteinTests
         var pattern = "pattern";
         var text = "atern----";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), 2)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(2)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -71,7 +71,7 @@ public class FuzzySearchStreamLevenshteinTests
         var pattern = "pattern";
         var text = "--paxxern--";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(1)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -85,7 +85,7 @@ public class FuzzySearchStreamLevenshteinTests
         var word = "pattern";
         var text = "paxxern";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(1)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -100,7 +100,7 @@ public class FuzzySearchStreamLevenshteinTests
         var word = "pattern";
         var text = "patern----";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(1)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -116,7 +116,7 @@ public class FuzzySearchStreamLevenshteinTests
         var word = "pattern";
         var text = "--patern--";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(1)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -132,7 +132,7 @@ public class FuzzySearchStreamLevenshteinTests
         var word = "pattern";
         var text = "--patternpattern--";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), 2)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(2)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -149,7 +149,7 @@ public class FuzzySearchStreamLevenshteinTests
         var word = "pattern";
         var text = "--pattern-pattern--";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(1)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -166,7 +166,7 @@ public class FuzzySearchStreamLevenshteinTests
         var word = "pattern";
         var text = "--pattermpatyern--";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), 2)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(2)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -183,7 +183,7 @@ public class FuzzySearchStreamLevenshteinTests
         var word = "pattern";
         var text = "--patyternpatxtern--";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(1)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -199,7 +199,7 @@ public class FuzzySearchStreamLevenshteinTests
         var word = "pattern";
         var text = "--pattpatterntern--";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), 2)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(2)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -214,7 +214,7 @@ public class FuzzySearchStreamLevenshteinTests
         var word = "pattern";
         var text = "--pattrnpttern--";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), 2)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(2)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -230,7 +230,7 @@ public class FuzzySearchStreamLevenshteinTests
     [TestCase("", "")]
     public async Task TestEmpty(string pattern, string text)
     {
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), 2)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(2)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -242,7 +242,7 @@ public class FuzzySearchStreamLevenshteinTests
     [TestCase("PATTERN", "PATERN", 1)]
     public async Task TestShorterText(string pattern, string text, int expectedMatches)
     {
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(1)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -255,7 +255,7 @@ public class FuzzySearchStreamLevenshteinTests
     [TestCase("PATTERN", "PAERN", 0)]
     public async Task TestShorterTextNoMatch(string pattern, string text, int expectedMatches)
     {
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(pattern, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(1)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -288,7 +288,7 @@ public class FuzzySearchStreamLevenshteinTests
     [TestCase("pattern", "----------------------pattttern", 22, "pattttern", 2)]
     public async Task TestLevenshteinBufferBoundary(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), 3, 12)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(3), 12).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -315,7 +315,7 @@ public class FuzzySearchStreamLevenshteinTests
     [TestCase("ab", "axb", 0, "axb", 1)]
     public async Task TestLevenshteinBufferBoundaryShort(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), 1)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(1)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -330,7 +330,7 @@ public class FuzzySearchStreamLevenshteinTests
     [TestCase("abc", "c", 0, "c", 2)]
     public async Task TestLevenshteinBufferBoundaryShort2Distance(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), 2)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(2)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -348,7 +348,7 @@ public class FuzzySearchStreamLevenshteinTests
     [TestCase("abcd", "xc", 0, "xc", 3)]
     public async Task TestLevenshteinBufferBoundaryShort3Distance(string term, string text, int expectedStartIndex, string expectedMatch, int expectedDistance)
     {
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), 3)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(3)).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -364,7 +364,7 @@ public class FuzzySearchStreamLevenshteinTests
         var text = "---abcc----abc---axc--";
         var term = "abc";
 
-        var results = (await FuzzySearch.FindLevenshteinAllAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), 2)).ToList();
+        var results = await FuzzySearch.FindLevenshteinAsync(term, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(2)).ToListAsync();
 
         Assert.Multiple(() =>
         {
