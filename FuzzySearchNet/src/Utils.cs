@@ -8,38 +8,40 @@ public static class Utils
     /// </summary>
     /// <param name="list"></param>
     /// <returns></returns>
-    public static IEnumerable<MatchResult> GetBestMatches(List<MatchResult> list, int maxDistanece)
+    public static IEnumerable<MatchResult> GetBestMatches(IEnumerable<MatchResult> matches, int maxDistanece)
     {
-        var matches = list.Distinct().ToList();
+        var matchesEnumerator = matches.GetEnumerator();
 
-        if (matches.Count > 1)
+        var group = new List<MatchResult>();
+
+        if (matchesEnumerator.MoveNext())
         {
-            var groups = new List<List<MatchResult>>();
+            group.Add(matchesEnumerator.Current);
 
-            groups.Add(new List<MatchResult>());
+            var match = matchesEnumerator.Current;
 
-            var match = matches[0];
-            groups[0].Add(match);
-
-            for (var i = 1; i < matches.Count; i++)
+            while (matchesEnumerator.MoveNext())
             {
-                var currentMatch = matches[i];
+                var currentMatch = matchesEnumerator.Current;
 
-                if (currentMatch.StartIndex > (match.StartIndex + maxDistanece))
+                if (currentMatch != null)
                 {
-                    groups.Add(new List<MatchResult>());
+                    if (currentMatch.StartIndex > (match.StartIndex + maxDistanece))
+                    {
+                        yield return group.OrderBy(o => o.Distance).ThenByDescending(o => o.Match.Length).First();
+                        group.Clear();
+                    }
+
+                    group.Add(currentMatch);
+
+                    match = currentMatch;
                 }
-
-                groups.Last().Add(currentMatch);
-
-                match = currentMatch;
             }
-
-            return groups.Select(o => o.OrderBy(o => o.Distance).ThenByDescending(o => o.Match.Length).First()).ToList();
         }
-        else
+
+        if (group.Any())
         {
-            return matches;
+            yield return group.OrderBy(o => o.Distance).ThenByDescending(o => o.Match.Length).First();
         }
     }
 }
