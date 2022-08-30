@@ -33,6 +33,12 @@ Searching for strings in strings
   if(FuzzySearch.Find(word, text, 2).Any()) {
     // do stuff
   }
+
+  // Use stream and asynchronously enumerate matches
+  await foreach (var match in FuzzySearch.FindLevenshteinAsync("somepattern", textstream))
+  {
+    // do stuff
+  }
   
     
   // Find returns a list of MatchResults with information about matches
