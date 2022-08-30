@@ -36,7 +36,10 @@ jobs:
 
     - name: Pack release
       if: "startsWith(github.ref, 'refs/tags/v')"
-      run: dotnet pack -c Release --no-build -p:PackageVersion=${${{github.ref_name}}:1}
+      run: |
+        TAG=${{ github.ref_name }}
+        VERSION=${TAG#v}"
+        dotnet pack -c Release --no-build -p:PackageVersion=$VERSION
                   
     - name: Upload nuget package
       if: (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') || startsWith(github.ref, 'refs/tags/v')
