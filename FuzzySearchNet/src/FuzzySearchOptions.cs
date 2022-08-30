@@ -12,8 +12,7 @@ public class FuzzySearchOptions
 
     /// <summary>
     /// Specify total maximum distance
-    /// </summary>
-    /// <param name="maxTotalDistance"></param>
+    /// </summary>    
     public FuzzySearchOptions(int maxTotalDistance)
     {
         MaxTotalDistance = maxTotalDistance;
@@ -21,11 +20,7 @@ public class FuzzySearchOptions
 
     /// <summary>
     /// Specify total maximum distance and optionally limit substitutions, deletions and insertions individually
-    /// </summary>
-    /// <param name="maxTotalDistance"></param>
-    /// <param name="maxSubstitutions"></param>
-    /// <param name="maxDeletions"></param>
-    /// <param name="maxInsertions"></param>
+    /// </summary>    
     public FuzzySearchOptions(int maxTotalDistance, int? maxSubstitutions = null, int? maxDeletions = null, int? maxInsertions = null) : this(maxTotalDistance)
     {
         MaxSubstitutions = maxSubstitutions;
@@ -35,10 +30,7 @@ public class FuzzySearchOptions
 
     /// <summary>
     /// Limit substitutions, deletions and insertions individually
-    /// </summary>
-    /// <param name="maxSubstitutions"></param>
-    /// <param name="maxDeletions"></param>
-    /// <param name="maxInsertions"></param>
+    /// </summary>    
     public FuzzySearchOptions(int maxSubstitutions, int maxDeletions, int maxInsertions)
     {
         MaxSubstitutions = maxSubstitutions;

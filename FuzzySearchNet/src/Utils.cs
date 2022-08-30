@@ -5,9 +5,7 @@ public static class Utils
     /// <summary>
     /// Group matches and return best.
     /// Currently assumes the matches are in the same order they are found...
-    /// </summary>
-    /// <param name="list"></param>
-    /// <returns></returns>
+    /// </summary>    
     public static IEnumerable<MatchResult> GetBestMatches(IEnumerable<MatchResult> matches, int maxDistanece)
     {
         var matchesEnumerator = matches.GetEnumerator();
@@ -50,8 +48,6 @@ public static class Utils
     /// Group matches and return best.
     /// Currently assumes the matches are in the same order they are found...
     /// </summary>
-    /// <param name="list"></param>
-    /// <returns></returns>
     public static async IAsyncEnumerable<MatchResult> GetBestMatchesAsync(IAsyncEnumerable<MatchResult> matches, int maxDistanece)
     {
         var matchesEnumerator = matches.GetAsyncEnumerator();
