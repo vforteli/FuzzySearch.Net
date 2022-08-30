@@ -9,7 +9,7 @@ public class FuzzySearchStreamSubstitutionsOnlyTests
         var text = "foo-----fo--foo-f--fooo--";
         var textStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
 
-        var results = (await FuzzySearch.FindSubstitutionsOnlyAsync(word, textStream, 1)).ToList();
+        var results = await FuzzySearch.FindSubstitutionsOnlyAsync(word, textStream, 1).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -35,7 +35,7 @@ public class FuzzySearchStreamSubstitutionsOnlyTests
     public async Task TestSubstitutionOnlyBufferBoundary(string term, string text, int expectedStartIndex)
     {
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
-        var results = (await FuzzySearch.FindSubstitutionsOnlyAsync(term, stream, 1, 16)).ToList();
+        var results = await FuzzySearch.FindSubstitutionsOnlyAsync(term, stream, 1, 16).ToListAsync();
 
         Assert.Multiple(() =>
         {
@@ -53,12 +53,27 @@ public class FuzzySearchStreamSubstitutionsOnlyTests
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
         var term = "thisislongerthanthebufferandshouldntexplode";
 
-        var results = (await FuzzySearch.FindSubstitutionsOnlyAsync(term, stream, 1, 16)).ToList();
+        var results = await FuzzySearch.FindSubstitutionsOnlyAsync(term, stream, 1, 16).ToListAsync();
 
         Assert.Multiple(() =>
         {
             Assert.That(results.Count, Is.EqualTo(1));
             TestUtils.AssertMatch(results[0], 24, 24 + term.Length, text);
+        });
+    }
+
+    [Test]
+    public async Task TestSubstitutionOnlyBiggerBufferLongerSubsequence()
+    {
+        var text = "thisislongerthanthebufferandshouldntexplo";
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        var term = "thisislongerthanthebufferandshouldntexplode";
+
+        var results = await FuzzySearch.FindSubstitutionsOnlyAsync(term, stream, 3).ToListAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(0));
         });
     }
 }

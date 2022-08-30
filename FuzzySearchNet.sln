@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FuzzySearchNet", "FuzzySear
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FuzzySearchNet.Tests", "FuzzySearchNet.Tests\FuzzySearchNet.Tests.csproj", "{98ABDD95-91F2-4828-A151-4801ED9DF08D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuzzySearchNet.Benchmark", "FuzzySearchNet.Benchmark\FuzzySearchNet.Benchmark.csproj", "{3E8EA714-797A-4A0C-BF88-3BFD46CC19E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FuzzySearchNet.Benchmark", "FuzzySearchNet.Benchmark\FuzzySearchNet.Benchmark.csproj", "{3E8EA714-797A-4A0C-BF88-3BFD46CC19E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
