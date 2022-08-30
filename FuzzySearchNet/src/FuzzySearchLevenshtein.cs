@@ -61,13 +61,6 @@ public partial class FuzzySearch
 
                 if (candidate.SubSequenceIndex < subSequence.Length && candidate.TextIndex < text.Length && text[candidate.TextIndex] == subSequence[candidate.SubSequenceIndex])
                 {
-                    // match                   
-                    candidates.Push(candidate with
-                    {
-                        TextIndex = candidate.TextIndex + 1,
-                        SubSequenceIndex = candidate.SubSequenceIndex + 1,
-                    });
-
                     if (candidate.Distance < bestFoundDistance && options.CanInsert(candidate.Distance, candidate.Insertions))
                     {
                         // jump over one character in text
@@ -79,9 +72,27 @@ public partial class FuzzySearch
                             TextIndex = candidate.TextIndex + 2,
                         });
                     }
+
+                    // match                   
+                    candidates.Push(candidate with
+                    {
+                        TextIndex = candidate.TextIndex + 1,
+                        SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                    });
                 }
                 else if (candidate.Distance < bestFoundDistance)
                 {
+                    if (options.CanDelete(candidate.Distance, candidate.Deletions))
+                    {
+                        // jump over one character in subsequence
+                        candidates.Push(candidate with
+                        {
+                            Deletions = candidate.Deletions + 1,
+                            Distance = candidate.Distance + 1,
+                            SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                        });
+                    }
+
                     if (options.CanSubstitute(candidate.Distance, candidate.Substitutions))
                     {
                         // substitute one character
@@ -90,17 +101,6 @@ public partial class FuzzySearch
                             Substitutions = candidate.Substitutions + 1,
                             Distance = candidate.Distance + 1,
                             TextIndex = candidate.TextIndex + 1,
-                            SubSequenceIndex = candidate.SubSequenceIndex + 1,
-                        });
-                    }
-
-                    if (options.CanDelete(candidate.Distance, candidate.Deletions))
-                    {
-                        // jump over one character in subsequence
-                        candidates.Push(candidate with
-                        {
-                            Deletions = candidate.Deletions + 1,
-                            Distance = candidate.Distance + 1,
                             SubSequenceIndex = candidate.SubSequenceIndex + 1,
                         });
                     }
@@ -175,13 +175,6 @@ public partial class FuzzySearch
 
                         if (candidate.SubSequenceIndex < subSequence.Length && candidate.TextIndex < bytesRead && buffer[candidate.TextIndex] == subSequence[candidate.SubSequenceIndex])
                         {
-                            // match
-                            candidates.Push(candidate with
-                            {
-                                TextIndex = candidate.TextIndex + 1,
-                                SubSequenceIndex = candidate.SubSequenceIndex + 1,
-                            });
-
                             if (candidate.Distance < bestFoundDistance && options.CanInsert(candidate.Distance, candidate.Insertions))
                             {
                                 // jump over one character in text
@@ -193,9 +186,27 @@ public partial class FuzzySearch
                                     TextIndex = candidate.TextIndex + 2,
                                 });
                             }
+
+                            // match
+                            candidates.Push(candidate with
+                            {
+                                TextIndex = candidate.TextIndex + 1,
+                                SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                            });
                         }
                         else if (candidate.Distance < bestFoundDistance)
                         {
+                            if (options.CanDelete(candidate.Distance, candidate.Deletions))
+                            {
+                                // jump over one character in subsequence
+                                candidates.Push(candidate with
+                                {
+                                    Deletions = candidate.Deletions + 1,
+                                    Distance = candidate.Distance + 1,
+                                    SubSequenceIndex = candidate.SubSequenceIndex + 1,
+                                });
+                            }
+
                             if (options.CanSubstitute(candidate.Distance, candidate.Substitutions))
                             {
                                 // substitute one character
@@ -204,17 +215,6 @@ public partial class FuzzySearch
                                     Substitutions = candidate.Substitutions + 1,
                                     Distance = candidate.Distance + 1,
                                     TextIndex = candidate.TextIndex + 1,
-                                    SubSequenceIndex = candidate.SubSequenceIndex + 1,
-                                });
-                            }
-
-                            if (options.CanDelete(candidate.Distance, candidate.Deletions))
-                            {
-                                // jump over one character in subsequence
-                                candidates.Push(candidate with
-                                {
-                                    Deletions = candidate.Deletions + 1,
-                                    Distance = candidate.Distance + 1,
                                     SubSequenceIndex = candidate.SubSequenceIndex + 1,
                                 });
                             }
