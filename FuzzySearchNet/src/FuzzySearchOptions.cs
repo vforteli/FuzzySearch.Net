@@ -6,9 +6,9 @@
 public class FuzzySearchOptions
 {
     public int MaxTotalDistance { get; private set; }
-    public int? MaxSubstitutions { get; private set; }
-    public int? MaxDeletions { get; private set; }
-    public int? MaxInsertions { get; private set; }
+    public int MaxSubstitutions { get; private set; }
+    public int MaxDeletions { get; private set; }
+    public int MaxInsertions { get; private set; }
 
     /// <summary>
     /// Specify total maximum distance
@@ -16,6 +16,9 @@ public class FuzzySearchOptions
     public FuzzySearchOptions(int maxTotalDistance)
     {
         MaxTotalDistance = maxTotalDistance;
+        MaxSubstitutions = maxTotalDistance;
+        MaxDeletions = maxTotalDistance;
+        MaxInsertions = maxTotalDistance;
     }
 
     /// <summary>
@@ -23,9 +26,9 @@ public class FuzzySearchOptions
     /// </summary>    
     public FuzzySearchOptions(int maxTotalDistance, int? maxSubstitutions = null, int? maxDeletions = null, int? maxInsertions = null) : this(maxTotalDistance)
     {
-        MaxSubstitutions = maxSubstitutions;
-        MaxDeletions = maxDeletions;
-        MaxInsertions = maxInsertions;
+        MaxSubstitutions = maxSubstitutions ?? maxTotalDistance;
+        MaxDeletions = maxDeletions ?? maxTotalDistance;
+        MaxInsertions = maxInsertions ?? maxTotalDistance;
     }
 
     /// <summary>
@@ -39,9 +42,9 @@ public class FuzzySearchOptions
         MaxTotalDistance = maxDeletions + maxInsertions + maxSubstitutions;
     }
 
-    public bool CanSubstitute(int currentTotalDistance, int currentSubstitutions) => (!MaxSubstitutions.HasValue || currentSubstitutions < MaxSubstitutions) && (currentTotalDistance < MaxTotalDistance);
+    public bool CanSubstitute(int currentTotalDistance, int currentSubstitutions) => currentSubstitutions < MaxSubstitutions && currentTotalDistance < MaxTotalDistance;
 
-    public bool CanDelete(int currentTotalDistance, int currentDeletions) => (!MaxDeletions.HasValue || currentDeletions < MaxDeletions) && (currentTotalDistance < MaxTotalDistance);
+    public bool CanDelete(int currentTotalDistance, int currentDeletions) => currentDeletions < MaxDeletions && currentTotalDistance < MaxTotalDistance;
 
-    public bool CanInsert(int currentTotalDistance, int currentInsertions) => (!MaxInsertions.HasValue || currentInsertions < MaxInsertions) && (currentTotalDistance < MaxTotalDistance);
+    public bool CanInsert(int currentTotalDistance, int currentInsertions) => currentInsertions < MaxInsertions && currentTotalDistance < MaxTotalDistance;
 }
