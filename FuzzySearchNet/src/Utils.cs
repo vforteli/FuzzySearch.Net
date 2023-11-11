@@ -16,7 +16,7 @@ public static class Utils
         {
             group.Add(matchesEnumerator.Current);
 
-            var match = matchesEnumerator.Current;
+            var matchStartIndex = matchesEnumerator.Current.StartIndex;
 
             while (matchesEnumerator.MoveNext())
             {
@@ -24,7 +24,7 @@ public static class Utils
 
                 if (currentMatch != null)
                 {
-                    if (currentMatch.StartIndex > (match.StartIndex + maxDistanece))
+                    if (currentMatch.StartIndex > (matchStartIndex + maxDistanece))
                     {
                         yield return group.OrderBy(o => o.Distance).ThenByDescending(o => o.Match.Length).First();
                         group.Clear();
@@ -32,7 +32,7 @@ public static class Utils
 
                     group.Add(currentMatch);
 
-                    match = currentMatch;
+                    matchStartIndex = currentMatch.StartIndex;
                 }
             }
         }
@@ -58,7 +58,7 @@ public static class Utils
         {
             group.Add(matchesEnumerator.Current);
 
-            var match = matchesEnumerator.Current;
+            var matchStartIndex = matchesEnumerator.Current.StartIndex;
 
             while (await matchesEnumerator.MoveNextAsync())
             {
@@ -66,7 +66,7 @@ public static class Utils
 
                 if (currentMatch != null)
                 {
-                    if (currentMatch.StartIndex > (match.StartIndex + maxDistanece))
+                    if (currentMatch.StartIndex > (matchStartIndex + maxDistanece))
                     {
                         yield return group.OrderBy(o => o.Distance).ThenByDescending(o => o.Match.Length).First();
                         group.Clear();
@@ -74,7 +74,7 @@ public static class Utils
 
                     group.Add(currentMatch);
 
-                    match = currentMatch;
+                    matchStartIndex = currentMatch.StartIndex;
                 }
             }
         }
