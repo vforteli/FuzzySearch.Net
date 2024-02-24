@@ -3,6 +3,34 @@ namespace FuzzySearchNet.Tests;
 public class FuzzySearchSubstitutionsOnlyTests
 {
     [Test]
+    public void TestPatternWithGrapheme()
+    {
+        var word = "PATTERN";
+        var text = "👩‍👩‍👦‍👦PATTERN";
+
+        var results = FuzzySearch.Find(word, text, 1, SearchOptions.SubstitutionsOnly).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results[0].Distance, Is.EqualTo(0));
+            Assert.That(results[0].StartIndex, Is.EqualTo(11));
+            Assert.That(results[0].EndIndex, Is.EqualTo(18));
+            Assert.That(results[0].Match, Is.EqualTo(word));
+        });
+    }
+
+    [Test]
+    public void TestEmptyPatternWithGrapheme()
+    {
+        var word = "";
+        var text = "👩‍👩‍👦‍👦PATTERN";
+
+        var results = FuzzySearch.Find(word, text, 1, SearchOptions.SubstitutionsOnly).ToList();
+
+        Assert.That(results, Is.Empty);
+    }
+
+    [Test]
     public void TestZeroMaxDistanceMultiple()
     {
         var word = "foo";

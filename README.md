@@ -53,3 +53,8 @@ Searching for strings in strings
       public int Insertions { get; set; }
   }
 ```
+
+# Performance considerations
+Prefer limiting matching to substitutions only in case insertions and deletions are not needed. Substitution only matching is generally several orders of magnitude faster than Levenshtein distance with insertions and deletions.   
+
+With small texts, the non async methods will put much less pressure on garbage collections. With larger texts, the streaming async methods can avoid reading the whole text into memory at the cost of more GC pressure.
