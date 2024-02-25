@@ -72,70 +72,72 @@ public partial class FuzzySearch
     /// </summary>    
     internal static async IAsyncEnumerable<MatchResultWithValue> FindLevenshteinAllAsync(string subSequence, Stream textStream, FuzzySearchOptions options, int bufferSize, bool leaveOpen = false)
     {
-        if (subSequence.Length > 0)
+        if (string.IsNullOrEmpty(subSequence))
         {
-            var candidates = new Stack<CandidateMatch>();
+            yield break;
+        }
 
-            var startBuffer = subSequence.Length + options.MaxTotalDistance;
-            bufferSize = ((startBuffer * 2 / bufferSize) + 1) * bufferSize;
-            var buffer = new char[bufferSize];
-            using var streamReader = new StreamReader(textStream, null, true, -1, leaveOpen);
+        var candidates = new Stack<CandidateMatch>();
 
-            var streamIndexOffset = 0;
+        var startBuffer = subSequence.Length + options.MaxTotalDistance;
+        bufferSize = ((startBuffer * 2 / bufferSize) + 1) * bufferSize;
+        var buffer = new char[bufferSize];
+        using var streamReader = new StreamReader(textStream, null, true, -1, leaveOpen);
 
-            var bytesRead = await streamReader.ReadBlockAsync(buffer, 0, buffer.Length);
+        var streamIndexOffset = 0;
 
-            do
+        var bytesRead = await streamReader.ReadBlockAsync(buffer, 0, buffer.Length);
+
+        do
+        {
+            for (var currentIndex = 0; currentIndex < bytesRead; currentIndex++)
             {
-                for (var currentIndex = 0; currentIndex < bytesRead; currentIndex++)
+                candidates.Push(new CandidateMatch(currentIndex, currentIndex));
+
+                // Keep track of the best distance so far, this means we can ignore candidates with higher distance if we already have a match
+                var bestFoundDistance = options.MaxTotalDistance;
+
+                while (candidates.TryPop(out var candidate))
                 {
-                    candidates.Push(new CandidateMatch(currentIndex, currentIndex));
-
-                    // Keep track of the best distance so far, this means we can ignore candidates with higher distance if we already have a match
-                    var bestFoundDistance = options.MaxTotalDistance;
-
-                    while (candidates.TryPop(out var candidate))
+                    if (candidate.SubSequenceIndex == subSequence.Length)
                     {
-                        if (candidate.SubSequenceIndex == subSequence.Length)
+                        if (candidate.TextIndex <= bytesRead)
                         {
-                            if (candidate.TextIndex <= bytesRead)
+                            bestFoundDistance = candidate.Distance;
+                            yield return new MatchResultWithValue
                             {
-                                bestFoundDistance = candidate.Distance;
-                                yield return new MatchResultWithValue
-                                {
-                                    StartIndex = streamIndexOffset + candidate.StartIndex,
-                                    EndIndex = streamIndexOffset + candidate.TextIndex,
-                                    Distance = candidate.Distance,
-                                    Match = new string(buffer[candidate.StartIndex..candidate.TextIndex]),
-                                    Deletions = candidate.Deletions,
-                                    Substitutions = candidate.Substitutions,
-                                    Insertions = candidate.Insertions,
-                                };
-                            }
-
-                            // No point searching for better matches if we find a perfect match
-                            if (candidate.Distance == 0)
-                            {
-                                candidates.Clear();
-                                break;
-                            }
-
-                            continue;
+                                StartIndex = streamIndexOffset + candidate.StartIndex,
+                                EndIndex = streamIndexOffset + candidate.TextIndex,
+                                Distance = candidate.Distance,
+                                Match = new string(buffer[candidate.StartIndex..candidate.TextIndex]),
+                                Deletions = candidate.Deletions,
+                                Substitutions = candidate.Substitutions,
+                                Insertions = candidate.Insertions,
+                            };
                         }
 
-                        HandleCandidate(candidates, candidate, buffer, subSequence, bestFoundDistance, options, bytesRead);
+                        // No point searching for better matches if we find a perfect match
+                        if (candidate.Distance == 0)
+                        {
+                            candidates.Clear();
+                            break;
+                        }
+
+                        continue;
                     }
+
+                    HandleCandidate(candidates, candidate, buffer, subSequence, bestFoundDistance, options, bytesRead);
                 }
-
-                streamIndexOffset += bytesRead - startBuffer;
-
-                // basically stride to ensure matches spanning chunks are handled correctly
-                Array.Copy(buffer, buffer.Length - startBuffer, buffer, 0, startBuffer);
-                bytesRead = await streamReader.ReadBlockAsync(buffer, startBuffer, buffer.Length - startBuffer);
-                bytesRead += startBuffer;
             }
-            while (bytesRead > startBuffer);
+
+            streamIndexOffset += bytesRead - startBuffer;
+
+            // basically stride to ensure matches spanning chunks are handled correctly
+            Array.Copy(buffer, buffer.Length - startBuffer, buffer, 0, startBuffer);
+            bytesRead = await streamReader.ReadBlockAsync(buffer, startBuffer, buffer.Length - startBuffer);
+            bytesRead += startBuffer;
         }
+        while (bytesRead > startBuffer);
     }
 
 

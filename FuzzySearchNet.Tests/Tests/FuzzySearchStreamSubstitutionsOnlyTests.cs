@@ -23,6 +23,21 @@ public class FuzzySearchStreamSubstitutionsOnlyTests
         });
     }
 
+    [Test]
+    public async Task TestSubstitutionOnlyPatternLongerThanText()
+    {
+        var text = "foo";
+        var word = "foo-----fo--foo-f--fooo--";
+        var textStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+
+        var results = await FuzzySearch.FindSubstitutionsOnlyAsync(word, textStream, 1).ToListAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(0));
+        });
+    }
+
     [TestCase("pattern", "patfern---------------------", 0)]
     [TestCase("pattern", "--------patfern-------------", 8)]
     [TestCase("pattern", "---------patfern------------", 9)]
