@@ -1,4 +1,4 @@
-﻿namespace FuzzySearchNet;
+namespace FuzzySearchNet;
 
 public partial class FuzzySearch
 {
@@ -12,16 +12,13 @@ public partial class FuzzySearch
             yield break;
         }
 
-        var termLengthMinusOne = subSequence.Length - 1;
-
-        for (var currentIndex = 0; currentIndex < text.Length - termLengthMinusOne; currentIndex++)
+        for (var currentIndex = 0; currentIndex < text.Length - (subSequence.Length - 1); currentIndex++)
         {
-            var needlePosition = currentIndex;
             var candidateDistance = 0;
 
-            for (var termIndex = 0; termIndex < subSequence.Length; termIndex++)
+            foreach (var (textChar, patternChar) in text[currentIndex..(currentIndex + subSequence.Length)].Zip(subSequence, (f, s) => (f, s)))
             {
-                if (text[needlePosition] != subSequence[termIndex])
+                if (textChar != patternChar)
                 {
                     candidateDistance++;
                     if (candidateDistance > maxDistance)
@@ -29,8 +26,6 @@ public partial class FuzzySearch
                         break;
                     }
                 }
-
-                needlePosition++;
             }
 
             if (candidateDistance <= maxDistance)
@@ -73,20 +68,13 @@ public partial class FuzzySearch
 
         do
         {
-            if (bytesRead < subSequence.Length)
-            {
-                // Cant have a match if subsequence is longer than text
-                yield break;
-            }
-
             for (var currentIndex = 0; currentIndex < bytesRead - subSequenceLengthMinusOne; currentIndex++)
             {
-                var needlePosition = currentIndex;
                 var candidateDistance = 0;
 
-                for (var subSequenceIndex = 0; subSequenceIndex < subSequence.Length; subSequenceIndex++)
+                foreach (var (textChar, patternChar) in buffer[currentIndex..(currentIndex + subSequence.Length)].Zip(subSequence, (f, s) => (f, s)))
                 {
-                    if (buffer[needlePosition] != subSequence[subSequenceIndex])
+                    if (textChar != patternChar)
                     {
                         candidateDistance++;
                         if (candidateDistance > maxDistance)
@@ -94,8 +82,6 @@ public partial class FuzzySearch
                             break;
                         }
                     }
-
-                    needlePosition++;
                 }
 
                 if (candidateDistance <= maxDistance)
