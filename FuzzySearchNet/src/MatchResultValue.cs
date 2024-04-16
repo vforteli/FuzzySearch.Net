@@ -1,7 +1,11 @@
 ﻿namespace FuzzySearchNet;
 
-internal record MatchResultWithValue
+internal record struct MatchResultWithValue
 {
+    public MatchResultWithValue()
+    {
+    }
+
     public int StartIndex { get; set; }
     public int EndIndex { get; set; }
     public int Distance { get; set; }
