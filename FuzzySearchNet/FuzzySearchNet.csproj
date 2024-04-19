@@ -7,15 +7,16 @@
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>    
     <IsPackable>true</IsPackable>
+    <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsAotCompatible>
   </PropertyGroup>
 
   <PropertyGroup>
     <PackageId>FuzzySearch.Net</PackageId>
-    <VersionPrefix>0.4.1</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Title>FuzzySearch.Net</Title>
     <Authors>Verner Fortelius</Authors>
     <Description>Fuzzy search library for finding strings in strings. Inspired by and attempts to be somewhat compatible with fuzzysearch for python https://github.com/taleinat/fuzzysearch</Description>
-    <Copyright>Copyright 2022 Verner Fortelius</Copyright>
+    <Copyright>Copyright 2024 Verner Fortelius</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/vforteli/FuzzySearch.Net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/vforteli/FuzzySearch.Net</RepositoryUrl>
