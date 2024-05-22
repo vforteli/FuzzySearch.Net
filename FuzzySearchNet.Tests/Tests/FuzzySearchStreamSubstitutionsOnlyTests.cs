@@ -91,4 +91,19 @@ public class FuzzySearchStreamSubstitutionsOnlyTests
             Assert.That(results.Count, Is.EqualTo(0));
         });
     }
+
+    [TestCase("pattern", "----PATTXRN----")]
+    [TestCase("PATTERN", "----pattxrn----")]
+    [TestCase("pattERN", "----pattXRN----")]
+    public async Task TestCaseInsensitiveMatch(string word, string text)
+    {
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        var results = await FuzzySearch.FindSubstitutionsOnlyAsync(word, stream, 1, invariantCultureIgnoreCase: true).ToListAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results, Has.Count.EqualTo(1));
+            Assert.That(results[0].StartIndex, Is.EqualTo(4));
+        });
+    }
 }

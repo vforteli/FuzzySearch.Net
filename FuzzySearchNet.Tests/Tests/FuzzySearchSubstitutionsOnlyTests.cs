@@ -180,4 +180,18 @@ public class FuzzySearchSubstitutionsOnlyTests
             Assert.That(results.Count, Is.EqualTo(0));
         });
     }
+
+    [TestCase("pattern", "----PATTXRN----")]
+    [TestCase("PATTERN", "----pattxrn----")]
+    [TestCase("pattERN", "----pattXRN----")]
+    public void TestCaseInsensitiveMatch(string word, string text)
+    {
+        var results = FuzzySearch.FindSubstitutionsOnly(word, text, 1, true).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results, Has.Count.EqualTo(1));
+            Assert.That(results[0].StartIndex, Is.EqualTo(4));
+        });
+    }
 }
