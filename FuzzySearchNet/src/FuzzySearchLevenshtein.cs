@@ -24,7 +24,7 @@ public partial class FuzzySearch
             yield break;
         }
 
-        subSequence = options.InvariantCultureIgnoreCase ? subSequence.ToLowerInvariant() : subSequence;
+        subSequence = options.InvariantCultureIgnoreCase ? subSequence.ToUpperInvariant() : subSequence;
         var candidates = new Stack<CandidateMatch>();
 
         for (var currentIndex = 0; currentIndex < text.Length; currentIndex++)
@@ -79,7 +79,7 @@ public partial class FuzzySearch
         }
 
         var candidates = new Stack<CandidateMatch>();
-        subSequence = options.InvariantCultureIgnoreCase ? subSequence.ToLowerInvariant() : subSequence;
+        subSequence = options.InvariantCultureIgnoreCase ? subSequence.ToUpperInvariant() : subSequence;
 
         var startBuffer = subSequence.Length + options.MaxTotalDistance;
         bufferSize = ((startBuffer * 2 / bufferSize) + 1) * bufferSize;
@@ -146,7 +146,7 @@ public partial class FuzzySearch
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void HandleCandidate(Stack<CandidateMatch> candidates, in CandidateMatch candidate, ReadOnlySpan<char> text, string subSequence, int bestFoundDistance, FuzzySearchOptions options, int textLength)
     {
-        if (candidate.TextIndex < textLength && (options.InvariantCultureIgnoreCase ? char.ToLowerInvariant(text[candidate.TextIndex]) : text[candidate.TextIndex]) == subSequence[candidate.SubSequenceIndex])
+        if (candidate.TextIndex < textLength && (options.InvariantCultureIgnoreCase ? char.ToUpperInvariant(text[candidate.TextIndex]) : text[candidate.TextIndex]) == subSequence[candidate.SubSequenceIndex])
         {
             if (candidate.Distance < bestFoundDistance && options.CanInsert(candidate.Distance, candidate.Insertions))
             {

@@ -12,7 +12,7 @@ public partial class FuzzySearch
             yield break;
         }
 
-        subSequence = invariantCultureIgnoreCase ? subSequence.ToLowerInvariant() : subSequence;
+        subSequence = invariantCultureIgnoreCase ? subSequence.ToUpperInvariant() : subSequence;
 
         for (var currentIndex = 0; currentIndex < text.Length - (subSequence.Length - 1); currentIndex++)
         {
@@ -21,7 +21,7 @@ public partial class FuzzySearch
 
             for (var termIndex = 0; termIndex < subSequence.Length; termIndex++)
             {
-                if ((invariantCultureIgnoreCase ? char.ToLowerInvariant(text[needlePosition]) : text[needlePosition]) != subSequence[termIndex])
+                if ((invariantCultureIgnoreCase ? char.ToUpperInvariant(text[needlePosition]) : text[needlePosition]) != subSequence[termIndex])
                 {
                     candidateDistance++;
                     if (candidateDistance > maxDistance)
@@ -61,7 +61,7 @@ public partial class FuzzySearch
             yield break;
         }
 
-        subSequence = invariantCultureIgnoreCase ? subSequence.ToLowerInvariant() : subSequence;
+        subSequence = invariantCultureIgnoreCase ? subSequence.ToUpperInvariant() : subSequence;
 
         var subSequenceLengthMinusOne = subSequence.Length - 1;
 
@@ -89,7 +89,7 @@ public partial class FuzzySearch
                 for (var subSequenceIndex = 0; subSequenceIndex < subSequence.Length; subSequenceIndex++)
                 {
                     var match = invariantCultureIgnoreCase
-                        ? char.ToLowerInvariant(buffer[needlePosition]) == subSequence[subSequenceIndex]
+                        ? char.ToUpperInvariant(buffer[needlePosition]) == subSequence[subSequenceIndex]
                         : buffer[needlePosition] == subSequence[subSequenceIndex];
 
                     if (!match)
