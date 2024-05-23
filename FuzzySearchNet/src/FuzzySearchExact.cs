@@ -14,7 +14,7 @@ public partial class FuzzySearch
             yield break;
         }
 
-        subSequence = invariantCultureIgnoreCase ? subSequence.ToLowerInvariant() : subSequence;
+        subSequence = invariantCultureIgnoreCase ? subSequence.ToUpperInvariant() : subSequence;
 
         // indexof would probably run circles around this...
         var needlePosition = 0;
@@ -23,7 +23,7 @@ public partial class FuzzySearch
 
         foreach (var currentCharacter in text)
         {
-            if ((invariantCultureIgnoreCase ? char.ToLowerInvariant(currentCharacter) : currentCharacter) == subSequence[needlePosition])
+            if ((invariantCultureIgnoreCase ? char.ToUpperInvariant(currentCharacter) : currentCharacter) == subSequence[needlePosition])
             {
                 if (needlePosition == termLength)
                 {
@@ -67,7 +67,7 @@ public partial class FuzzySearch
             yield break;
         }
 
-        subSequence = invariantCultureIgnoreCase ? subSequence.ToLowerInvariant() : subSequence;
+        subSequence = invariantCultureIgnoreCase ? subSequence.ToUpperInvariant() : subSequence;
 
         var needlePosition = 0;
         var termLength = subSequence.Length - 1;
@@ -83,7 +83,7 @@ public partial class FuzzySearch
         {
             for (var currentIndex = 0; currentIndex < bytesRead; currentIndex++)
             {
-                if ((invariantCultureIgnoreCase ? char.ToLowerInvariant(buffer[currentIndex]) : buffer[currentIndex]) == subSequence[needlePosition])
+                if ((invariantCultureIgnoreCase ? char.ToUpperInvariant(buffer[currentIndex]) : buffer[currentIndex]) == subSequence[needlePosition])
                 {
                     if (needlePosition == termLength)
                     {
