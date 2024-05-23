@@ -380,4 +380,36 @@ public class FuzzySearchStreamLevenshteinTests
             TestUtils.AssertMatch(FuzzySearch.FindLevenshtein(term, text, new FuzzySearchOptions(3)).First(), 3, "abc", 0);
         });
     }
+
+    [Test]
+    public async Task TestMultipleMatchesConsecutiveCaseInsensitive()
+    {
+        var word = "PATTERN";
+        var text = "--patternpattern--";
+
+        var results = await FuzzySearch.FindAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(2, true)).ToListAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(2));
+            TestUtils.AssertMatch(results[0], 2, "pattern", 0);
+            TestUtils.AssertMatch(results[1], 9, "pattern", 0);
+        });
+    }
+
+    [Test]
+    public async Task TestMultipleMatchesConsecutiveCaseInsensitive2()
+    {
+        var word = "pattern";
+        var text = "--PATTERNPATTERN--";
+
+        var results = await FuzzySearch.FindAsync(word, new MemoryStream(Encoding.UTF8.GetBytes(text)), new FuzzySearchOptions(2, true)).ToListAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(2));
+            TestUtils.AssertMatch(results[0], 2, "PATTERN", 0);
+            TestUtils.AssertMatch(results[1], 9, "PATTERN", 0);
+        });
+    }
 }

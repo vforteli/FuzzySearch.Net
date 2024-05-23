@@ -46,4 +46,20 @@ public class FuzzySearchStreamExactMatchTests
             Assert.That(results[0].Match, Is.EqualTo(term));
         });
     }
+
+
+    [TestCase("pattern", "----PATTERN----")]
+    [TestCase("PATTERN", "----pattern----")]
+    [TestCase("pattERN", "----pattERN----")]
+    public async Task TestCaseInsensitiveMatch(string word, string text)
+    {
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        var results = await FuzzySearch.FindExactAsync(word, stream, invariantCultureIgnoreCase: true).ToListAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results, Has.Count.EqualTo(1));
+            Assert.That(results[0].StartIndex, Is.EqualTo(4));
+        });
+    }
 }

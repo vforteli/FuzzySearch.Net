@@ -21,11 +21,7 @@ public partial class FuzzySearch
 
             for (var termIndex = 0; termIndex < subSequence.Length; termIndex++)
             {
-                var match = invariantCultureIgnoreCase
-                    ? char.ToLowerInvariant(text[needlePosition]) == subSequence[termIndex]
-                    : text[needlePosition] == subSequence[termIndex];
-
-                if (!match)
+                if ((invariantCultureIgnoreCase ? char.ToLowerInvariant(text[needlePosition]) : text[needlePosition]) != subSequence[termIndex])
                 {
                     candidateDistance++;
                     if (candidateDistance > maxDistance)

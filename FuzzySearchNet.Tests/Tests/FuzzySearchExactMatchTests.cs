@@ -48,7 +48,7 @@ public class FuzzySearchExactMatchTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(results.Count, Is.EqualTo(1));
+            Assert.That(results, Has.Count.EqualTo(1));
             Assert.That(results[0].StartIndex, Is.EqualTo(0));
             Assert.That(results[0].EndIndex, Is.EqualTo(3));
             Assert.That(results[0].Match, Is.EqualTo(word));
@@ -65,6 +65,20 @@ public class FuzzySearchExactMatchTests
         Assert.Multiple(() =>
         {
             Assert.That(results.Count, Is.EqualTo(0));
+        });
+    }
+
+    [TestCase("pattern", "----PATTERN----")]
+    [TestCase("PATTERN", "----pattern----")]
+    [TestCase("pattERN", "----pattERN----")]
+    public void TestCaseInsensitiveMatch(string word, string text)
+    {
+        var results = FuzzySearch.FindExact(word, text, invariantCultureIgnoreCase: true).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results, Has.Count.EqualTo(1));
+            Assert.That(results[0].StartIndex, Is.EqualTo(4));
         });
     }
 }

@@ -9,16 +9,23 @@ public class FuzzySearchOptions
     public int MaxSubstitutions { get; private set; }
     public int MaxDeletions { get; private set; }
     public int MaxInsertions { get; private set; }
+    public bool InvariantCultureIgnoreCase { get; private set; } = false;
 
     /// <summary>
     /// Specify total maximum distance
     /// </summary>    
-    public FuzzySearchOptions(int maxTotalDistance)
+    public FuzzySearchOptions(int maxTotalDistance) : this(maxTotalDistance, false) { }
+
+    /// <summary>
+    /// Specify total maximum distance
+    /// </summary>    
+    public FuzzySearchOptions(int maxTotalDistance, bool invariantCultureIgnoreCase)
     {
         MaxTotalDistance = maxTotalDistance;
         MaxSubstitutions = maxTotalDistance;
         MaxDeletions = maxTotalDistance;
         MaxInsertions = maxTotalDistance;
+        InvariantCultureIgnoreCase = invariantCultureIgnoreCase;
     }
 
     /// <summary>
