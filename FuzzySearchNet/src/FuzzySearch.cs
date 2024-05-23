@@ -39,7 +39,7 @@ public static partial class FuzzySearch
 
 
     /// <summary>
-    /// Find instances of sub sequence in text up to maximum maximum distance.
+    /// Find instances of sub sequence in text up to maximum distance.
     /// </summary>    
     public static IEnumerable<MatchResult> Find(string subSequence, string text, int maxDistance) => Find(subSequence, text, maxDistance, SearchOptions.None);
 

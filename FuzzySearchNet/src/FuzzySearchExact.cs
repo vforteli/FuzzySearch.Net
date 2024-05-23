@@ -7,12 +7,14 @@ public partial class FuzzySearch
     /// </summary>
     /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    public static IEnumerable<MatchResult> FindExact(string subSequence, string text)
+    public static IEnumerable<MatchResult> FindExact(string subSequence, string text, bool invariantCultureIgnoreCase = false)
     {
         if (string.IsNullOrEmpty(subSequence))
         {
             yield break;
         }
+
+        subSequence = invariantCultureIgnoreCase ? subSequence.ToLowerInvariant() : subSequence;
 
         // indexof would probably run circles around this...
         var needlePosition = 0;
@@ -21,7 +23,7 @@ public partial class FuzzySearch
 
         foreach (var currentCharacter in text)
         {
-            if (currentCharacter == subSequence[needlePosition])
+            if ((invariantCultureIgnoreCase ? char.ToLowerInvariant(currentCharacter) : currentCharacter) == subSequence[needlePosition])
             {
                 if (needlePosition == termLength)
                 {
@@ -58,12 +60,14 @@ public partial class FuzzySearch
     /// </summary>
     /// <param name="subSequence"></param>
     /// <param name="text"></param>    
-    public static async IAsyncEnumerable<MatchResult> FindExactAsync(string subSequence, Stream textStream, int bufferSize = 4096)
+    public static async IAsyncEnumerable<MatchResult> FindExactAsync(string subSequence, Stream textStream, int bufferSize = 4096, bool invariantCultureIgnoreCase = false)
     {
         if (string.IsNullOrEmpty(subSequence))
         {
             yield break;
         }
+
+        subSequence = invariantCultureIgnoreCase ? subSequence.ToLowerInvariant() : subSequence;
 
         var needlePosition = 0;
         var termLength = subSequence.Length - 1;
@@ -79,7 +83,7 @@ public partial class FuzzySearch
         {
             for (var currentIndex = 0; currentIndex < bytesRead; currentIndex++)
             {
-                if (buffer[currentIndex] == subSequence[needlePosition])
+                if ((invariantCultureIgnoreCase ? char.ToLowerInvariant(buffer[currentIndex]) : buffer[currentIndex]) == subSequence[needlePosition])
                 {
                     if (needlePosition == termLength)
                     {
